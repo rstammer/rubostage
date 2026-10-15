@@ -69,4 +69,66 @@ RSpec.describe "Songs", type: :request do
       expect(Player).to have_received(:stop)
     end
   end
+
+  describe "editing" do
+    let(:song) { create(:song, :ready) }
+    let(:tab) { "e|----------------|\nB|----------------|\nG|----------------|\nD|----------------|\nA|----------------|\nE|0---0---3---5---|\n" }
+
+    def edit_params(chords: "B | C#m | G#m | E", **changes)
+      {song: {title: "Starlight", artist: "Muse", key: "B", bpm: "122", form: "Verse", tuning: "standard", tone: "crunch",
+              sections: {"0" => {original: "Verse", name: "Verse", chords: chords, tab: tab}}}.merge(changes)}
+    end
+
+    it "is reached from the song" do
+      get song_path(song)
+      expect(response.body).to include(edit_song_path(song))
+    end
+
+    it "shows every field, the chords as text and a tab box per section" do
+      get edit_song_path(song)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('name="song[bpm]"', "B | C#m | G#m | E", 'name="song[sections][0][tab]"', 'name="song[sections][1][name]"')
+    end
+
+    it "only shows the band's parts once there is an arrangement" do
+      get edit_song_path(song)
+      expect(response.body).not_to include('name="song[sections][0][groove]"')
+      song.update!(arrangement: {"sections" => {}}, arrangement_status: "ready")
+      get edit_song_path(song)
+      expect(response.body).to include('name="song[sections][0][groove]"', 'name="song[sections][0][guitar]"')
+    end
+
+    it "stores the changes and goes back to the song" do
+      patch song_path(song), params: edit_params(bpm: "118")
+      expect(response).to redirect_to(song_path(song))
+      expect(song.reload.bpm).to eq(118)
+      expect(song.riffs.tab("Verse")).to be_present
+    end
+
+    it "shows what is wrong and keeps the text" do
+      patch song_path(song), params: edit_params(chords: "B | Hm")
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("B | Hm")
+    end
+
+    it "swaps the new voices into the song while it plays" do
+      NowPlaying.current_song_id = song.id
+      allow(Player).to receive(:upgrade)
+      patch song_path(song), params: edit_params
+      expect(Player).to have_received(:upgrade).with(song.reload.voices_code)
+    ensure
+      NowPlaying.current_song_id = nil
+    end
+
+    it "leaves a playing song alone when its tempo changed" do
+      NowPlaying.current_song_id = song.id
+      allow(Player).to receive(:upgrade)
+      patch song_path(song), params: edit_params(bpm: "100")
+      expect(Player).not_to have_received(:upgrade)
+      follow_redirect!
+      expect(response.body).to include("neu starten")
+    ensure
+      NowPlaying.current_song_id = nil
+    end
+  end
 end

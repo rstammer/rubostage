@@ -32,6 +32,9 @@
     </header>
 
     <main class="mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16">
+      <% if flash[:notice] %>
+        <p class="mb-8 rounded-2xl border-2 border-ink/30 px-5 py-4 text-lg"><%= flash[:notice] %></p>
+      <% end %>
       <% if flash[:alert] %>
         <p class="mb-8 rounded-2xl border-2 border-accent bg-accent/15 px-5 py-4 text-lg"><%= flash[:alert] %></p>
       <% end %>

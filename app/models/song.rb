@@ -31,8 +31,13 @@ class Song < ApplicationRecord
     Arrangement.from_h(arrangement, lead_sheet) if arrangement.present?
   end
 
+  def riffs
+    RiffTrack.from_h(riff_track) if riff_track.present?
+  end
+
   def groove
-    Groove.new(lead_sheet, song_id: id, osc_port: Rails.application.config.x.osc_port, arrangement: full_arrangement)
+    Groove.new(lead_sheet, song_id: id, osc_port: Rails.application.config.x.osc_port,
+      arrangement: full_arrangement, riffs: riffs)
   end
 
   def display_title

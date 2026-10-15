@@ -1,0 +1,134 @@
+<% content_for :title, "#{@song.display_title} bearbeiten – mcblinded stage" %>
+<% field = "mt-2 w-full rounded-xl border-2 border-ink bg-paper px-3 py-2 text-lg focus:border-accent focus:outline-none" %>
+<% label = "eyebrow block" %>
+<% card = "rounded-3xl border-2 border-ink bg-card p-5 sm:p-7" %>
+
+<p class="eyebrow">Bearbeiten</p>
+<h1 class="mt-3 text-5xl leading-[1.05] font-semibold tracking-tight sm:text-6xl"><%= @song.display_title %></h1>
+
+<% if @editor.error %>
+  <p class="mt-8 rounded-2xl border-2 border-accent bg-accent/15 px-5 py-4 text-lg">
+    Nicht gespeichert: <%= @editor.error %>
+  </p>
+<% end %>
+
+<%= form_with url: song_path(@song), method: :patch, scope: :song, class: "mt-10 space-y-6" do %>
+  <section class="<%= card %> grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= label_tag "song_title", "Titel", class: label %>
+      <%= text_field_tag "song[title]", @editor.title, id: "song_title", class: field %>
+    </div>
+    <div>
+      <%= label_tag "song_artist", "Band", class: label %>
+      <%= text_field_tag "song[artist]", @editor.artist, id: "song_artist", class: field %>
+    </div>
+    <div class="grid grid-cols-2 gap-5">
+      <div>
+        <%= label_tag "song_key", "Tonart", class: label %>
+        <%= text_field_tag "song[key]", @editor.key, id: "song_key", class: field %>
+      </div>
+      <div>
+        <%= label_tag "song_bpm", "BPM", class: label %>
+        <%= number_field_tag "song[bpm]", @editor.bpm, id: "song_bpm", min: SongSheet::BPM_RANGE.min, max: SongSheet::BPM_RANGE.max, class: field %>
+      </div>
+    </div>
+    <div>
+      <%= label_tag "song_form", "Ablauf", class: label %>
+      <%= text_field_tag "song[form]", @editor.form, id: "song_form", class: field, placeholder: "Intro, Verse, Chorus, Verse" %>
+      <p class="mt-1 text-muted">Teile in Spielreihenfolge, mit Komma getrennt.</p>
+    </div>
+  </section>
+
+  <section class="<%= card %> grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= label_tag "song_tuning", "Stimmung der Tabs", class: label %>
+      <%= select_tag "song[tuning]", options_for_select(
+            {"Standard (E A D G B E)" => "standard", "Drop D" => "drop_d",
+             "Halbton tiefer (Eb)" => "half_down", "D-Standard" => "d_standard"}, @editor.tuning),
+            id: "song_tuning", class: field %>
+    </div>
+    <div>
+      <%= label_tag "song_tone", "Klang der Riffs", class: label %>
+      <%= select_tag "song[tone]", options_for_select({"Verzerrt" => "crunch", "Clean" => "clean"}, @editor.tone),
+            id: "song_tone", class: field %>
+    </div>
+    <p class="text-muted sm:col-span-2">
+      Ein Zeichen ist eine Sechzehntel, ein Takt hat 16 Zeichen zwischen zwei <code>|</code>. Oben steht die hohe Saite.
+      Zahl = Bund, <code>x</code> = gedämpft, <code>-</code> = klingen lassen. Längere Riffs als weiterer Block von sechs Zeilen.
+      Ein Riff wiederholt sich, bis sein Teil zu Ende ist.
+    </p>
+  </section>
+
+  <% @editor.rows.each_with_index do |row, i| %>
+    <% name = ->(attr) { "song[sections][#{i}][#{attr}]" } %>
+    <% id = ->(attr) { "section_#{i}_#{attr}" } %>
+    <section class="<%= card %>">
+      <%= hidden_field_tag name.call(:original), row.original, id: nil %>
+      <div class="grid gap-5 sm:grid-cols-[1fr_2fr]">
+        <div>
+          <%= label_tag id.call(:name), row.original.present? ? "Abschnitt" : "Neuer Abschnitt", class: label %>
+          <%= text_field_tag name.call(:name), row.name, id: id.call(:name), class: "#{field} font-semibold",
+                placeholder: ("z. B. Bridge" if row.original.blank?) %>
+          <% if row.original.present? %>
+            <p class="mt-1 text-muted">Name und Akkorde leeren entfernt den Abschnitt.</p>
+          <% end %>
+        </div>
+        <div>
+          <%= label_tag id.call(:chords), "Akkorde", class: label %>
+          <%= text_area_tag name.call(:chords), row.chords, id: id.call(:chords), rows: 2, class: field,
+                placeholder: "Am | F | C G | G" %>
+          <p class="mt-1 text-muted">Takte mit <code>|</code> oder Zeilenumbruch, zwei Akkorde in einem Takt mit Leerzeichen.</p>
+        </div>
+      </div>
+
+      <% if @editor.arranged? %>
+        <div class="mt-5 grid grid-cols-2 gap-5 sm:grid-cols-5">
+          <div>
+            <%= label_tag id.call(:energy), "Energie", class: label %>
+            <%= select_tag name.call(:energy), options_for_select({"1 leise" => 1, "2 mittel" => 2, "3 voll" => 3}, row.energy || 2),
+                  id: id.call(:energy), class: field %>
+          </div>
+          <div>
+            <%= label_tag id.call(:groove), "Groove", class: label %>
+            <%= select_tag name.call(:groove), options_for_select(
+                  DrumGroove::NAMES.map(&:to_s) + (row.groove == "custom" ? ["custom"] : []), row.groove || "rock"),
+                  id: id.call(:groove), class: field %>
+          </div>
+          <div>
+            <%= label_tag id.call(:guitar), "Gitarre", class: label %>
+            <%= select_tag name.call(:guitar), options_for_select(
+                  {"Powerchords" => "power", "Palm Mutes" => "palm", "Offen geschlagen" => "strum", "Stabs" => "stabs", "keine" => "none"},
+                  row.guitar || "strum"), id: id.call(:guitar), class: field %>
+          </div>
+          <div>
+            <%= label_tag id.call(:swing), "Swing", class: label %>
+            <%= number_field_tag name.call(:swing), row.swing || 0, id: id.call(:swing), min: 0, max: Arrangement::Part::MAX_SWING, step: 0.01, class: field %>
+          </div>
+          <div class="flex items-end pb-3">
+            <%= hidden_field_tag name.call(:fill), "0", id: nil %>
+            <label class="flex items-center gap-3 text-lg">
+              <%= check_box_tag name.call(:fill), "1", row.fill, id: id.call(:fill), class: "size-5 accent-accent" %>
+              Fill am Ende
+            </label>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="mt-5" data-controller="tab" data-tab-strings-value="<%= Tab.labels(@editor.tuning.presence_in(Tab::TUNINGS.keys) || "standard").to_json %>">
+        <div class="flex items-center justify-between gap-3">
+          <%= label_tag id.call(:tab), "Riff (Tab)", class: label %>
+          <button type="button" class="ring-button !px-4 !py-1 !text-base" data-action="tab#addBar">+ Takt</button>
+        </div>
+        <%= text_area_tag name.call(:tab), row.tab, id: id.call(:tab), rows: 7, wrap: "off", spellcheck: false,
+              class: "#{field} overflow-x-auto font-mono text-base leading-snug whitespace-pre",
+              data: {tab_target: "input", action: "input->tab#check"} %>
+        <p class="mt-1 text-muted" data-tab-target="status" aria-live="polite"></p>
+      </div>
+    </section>
+  <% end %>
+
+  <div class="flex flex-wrap justify-end gap-3">
+    <%= link_to "Abbrechen", song_path(@song), class: "ring-button" %>
+    <button type="submit" class="ring-button bg-ink text-paper hover:!bg-accent hover:!border-accent hover:!text-accent-ink">Speichern</button>
+  </div>
+<% end %>

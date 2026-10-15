@@ -11,11 +11,12 @@
 class Groove
   # With a song id, the groove reports every chord change to the stage over
   # OSC, so the lead sheet can follow along.
-  def initialize(sheet, song_id: nil, osc_port: nil, arrangement: nil)
+  def initialize(sheet, song_id: nil, osc_port: nil, arrangement: nil, riffs: nil)
     @sheet = sheet
     @song_id = song_id
     @osc_port = osc_port
     @arrangement = arrangement
+    @riffs = riffs unless riffs.nil? || riffs.empty?
   end
 
   # One entry per chord in playing order.
@@ -66,9 +67,13 @@ class Groove
       # The closing chord: [bass note, voicing]
       final = [#{final_chord.bass_note}, #{final_chord.voicing.inspect}]
     RUBY
-    return block unless @arrangement
+    block += arranged_data if @arrangement
+    block += riffs_data if @riffs
+    block
+  end
 
-    block + <<~RUBY
+  def arranged_data
+    <<~RUBY
 
       # Per section: which chord sounds on each beat, as an index into its chords
       beats_at = #{beat_maps.inspect}
@@ -98,7 +103,8 @@ class Groove
   end
 
   def voices_block
-    @arrangement ? arranged_voices : plain_voices
+    voices = @arrangement ? arranged_voices : plain_voices
+    @riffs ? voices + "\n" + riff_voice : voices
   end
 
   def plain_voices
@@ -313,6 +319,52 @@ class Groove
     RUBY
   end
 
+  def riffs_data
+    <<~RUBY
+
+      # Per section: the riff from its tab as [length in steps, swing, notes],
+      # each note [step, pitch, steps held]; nil where there is no tab.
+      riffs = [
+      #{riffs_literal}
+      ]
+    RUBY
+  end
+
+  # Robin's riffs, played as written. A section's tab repeats until the
+  # section ends; a note held for 0 steps is a muted dead note.
+  def riff_voice
+    crunch = @riffs.tone == "crunch"
+    <<~RUBY
+      live_loop :riff do
+        pos = sync(:section)[0]
+        stop if pos < 0
+        riff = riffs[form[pos]]
+        if riff
+          use_synth :#{crunch ? "dsaw" : "pluck"}
+          with_fx #{crunch ? ":distortion, distort: 0.8" : ":reverb, room: 0.4, mix: 0.2"} do
+            with_fx :lpf, cutoff: 100 do
+              (sections[form[pos]].sum { |entry| entry[2] } * 4).times do |slot|
+                step = slot % riff[0]
+                late = (step % 4 == 2) ? riff[1] * 0.5 : 0
+                riff[2].each do |hit_step, pitch, held|
+                  next unless hit_step == step
+                  time_warp late do
+                    if held == 0
+                      play pitch, release: 0.05, amp: 0.15
+                    else
+                      #{crunch ? "play pitch, sustain: held * 0.25 - 0.1, release: 0.1, amp: 0.25, detune: 0.1" : "play pitch, release: held * 0.25, amp: 0.4"}
+                    end
+                  end
+                end
+                sleep 0.25
+              end
+            end
+          end
+        end
+      end
+    RUBY
+  end
+
   def conductor_block
     <<~RUBY
       # Decides what comes next and cues it. Defined last, so every voice above
@@ -370,6 +422,16 @@ class Groove
         "   kick: #{drums[:kick].inspect}, snare: #{drums[:snare].inspect},\n" \
         "   hat: #{drums[:hat].inspect}, open_hat: #{drums[:open_hat].inspect},\n" \
         "   bass: #{part.bass.inspect}, comp: #{part.comp.inspect}, pad: #{part.pad}}, # #{section.name}"
+    end.join("\n")
+  end
+
+  def riffs_literal
+    @sheet.sections.map do |section|
+      tab = @riffs.tab(section.name)
+      next "  nil, # #{section.name}" unless tab
+
+      swing = @arrangement ? @arrangement.section(section.name).swing : 0
+      "  [#{tab.steps}, #{swing}, #{tab.notes.inspect}], # #{section.name}"
     end.join("\n")
   end
 

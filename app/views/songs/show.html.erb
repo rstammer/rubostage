@@ -40,6 +40,7 @@
       <%= button_to playback_path, method: :delete, class: "ring-button", data: {hotkey: "s escape"} do %>
         ■ Stopp
       <% end %>
+      <%= link_to "✎ Bearbeiten", edit_song_path(@song), class: "ring-button" %>
     </div>
   </div>
 
