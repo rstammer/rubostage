@@ -1,14 +1,19 @@
 # Where a song is right now, from the step index Sonic Pi reports: the chord,
-# the one after it, the section, and which chord on the sheet to mark.
+# the one after it, the section, and which chord on the sheet to mark. An
+# index of -1 means the song has played its closing chord.
 class NowPlaying
-  Step = Struct.new(:section, :section_index, :position, :chord)
+  Step = Struct.new(:section, :section_index, :form_position, :position, :chord)
 
   attr_reader :song, :index
 
   def self.broadcast(song, index)
+    now = new(song, index)
     Turbo::StreamsChannel.broadcast_replace_to(
-      song, :now, target: "now_playing", partial: "songs/now", locals: {now: new(song, index)}
+      song, :now, target: "now_playing", partial: "songs/now", locals: {now: now}
     )
+    # A queued command takes effect at a section boundary, so that is where
+    # the note about it goes away.
+    Turbo::StreamsChannel.broadcast_update_to(song, :now, target: "queued", html: "") if now.section_start?
   end
 
   # index nil means nothing is playing yet.
@@ -19,32 +24,44 @@ class NowPlaying
 
   def playing? = !index.nil?
 
+  def finished? = playing? && index.negative?
+
   def chord = current&.chord
 
   def section = current&.section
 
+  def form_position = current&.form_position
+
   def next_chord
-    steps[(index + 1) % steps.size].chord if playing?
+    return unless current
+
+    following = steps[index + 1]
+    following ? following.chord : "Schluss"
+  end
+
+  def section_start?
+    finished? || current&.position&.zero?
   end
 
   # DOM id of the current chord on the sheet, which shows each section once.
   def sheet_id
-    "chord-#{current.section_index}-#{current.position}" if playing?
+    "chord-#{current.section_index}-#{current.position}" if current
   end
 
   private
 
   def current
-    steps[index % steps.size] if playing?
+    steps[index] if playing? && !finished?
   end
 
   def steps
     @steps ||= begin
       sheet = song.lead_sheet
-      sheet.played_sections.flat_map do |section|
+      sheet.played_sections.each_with_index.flat_map do |section, form_position|
         section_index = sheet.sections.index(section)
-        chords = section.bars.flatten
-        chords.each_with_index.map { |chord, i| Step.new(section.name, section_index, i, chord.to_s) }
+        section.bars.flatten.each_with_index.map do |chord, i|
+          Step.new(section.name, section_index, form_position, i, chord.to_s)
+        end
       end
     end
   end

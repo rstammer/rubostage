@@ -5,6 +5,7 @@ Rails.application.routes.draw do
 
   resources :songs, only: [:index, :create, :show] do
     resource :playback, only: :create
+    resource :command, only: :create
   end
   resource :playback, only: :destroy
 end

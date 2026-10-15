@@ -19,6 +19,8 @@
 
 <% else %>
   <% sheet = @song.lead_sheet %>
+  <% primary = "ring-button bg-ink text-paper hover:!bg-accent hover:!border-accent hover:!text-accent-ink" %>
+  <div data-controller="hotkeys">
   <div class="flex flex-wrap items-end justify-between gap-8">
     <div>
       <p class="eyebrow"><%= sheet.artist %></p>
@@ -28,10 +30,10 @@
       </p>
     </div>
     <div class="flex gap-3">
-      <%= button_to song_playback_path(@song), class: "ring-button bg-ink text-paper hover:!bg-accent hover:!border-accent hover:!text-accent-ink" do %>
+      <%= button_to song_playback_path(@song), class: primary, data: {hotkey: "p"} do %>
         ▶ Spielen
       <% end %>
-      <%= button_to playback_path, method: :delete, class: "ring-button" do %>
+      <%= button_to playback_path, method: :delete, class: "ring-button", data: {hotkey: "s escape"} do %>
         ■ Stopp
       <% end %>
     </div>
@@ -40,13 +42,31 @@
   <%= turbo_stream_from @song, :now %>
   <section class="mt-10">
     <%= render "songs/now", now: NowPlaying.new(@song, nil) %>
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <%= button_to song_command_path(@song, kind: "repeat"), class: "ring-button", data: {hotkey: "r"} do %>
+        ↻ Teil wiederholen
+      <% end %>
+      <%= button_to song_command_path(@song, kind: "next"), class: "ring-button", data: {hotkey: "n arrowright"} do %>
+        → Nächster Teil
+      <% end %>
+      <%= button_to song_command_path(@song, kind: "end"), class: "ring-button", data: {hotkey: "e"} do %>
+        ⏏ Schluss
+      <% end %>
+      <p id="queued" class="text-lg" aria-live="polite"></p>
+    </div>
   </section>
 
   <section class="mt-12">
-    <h2 class="eyebrow">Ablauf</h2>
+    <h2 class="eyebrow">Ablauf – antippen springt dorthin</h2>
     <ol class="mt-3 flex flex-wrap gap-2">
-      <% sheet.form.each do |name| %>
-        <li class="rounded-full border-2 border-ink px-4 py-1 text-lg"><%= name %></li>
+      <% sheet.form.each_with_index do |name, i| %>
+        <li>
+          <%= button_to song_command_path(@song, kind: "jump", position: i), id: "form-#{i}",
+                class: "rounded-full border-2 border-ink px-4 py-1 text-lg hover:border-accent",
+                data: ({hotkey: (i + 1).to_s} if i < 9) do %>
+            <%= name %>
+          <% end %>
+        </li>
       <% end %>
     </ol>
   </section>
@@ -70,5 +90,9 @@
     <% end %>
   </section>
 
-  <p class="mt-12 text-muted">Nur Form und Akkorde – Text und Melodie kommen von dir.</p>
+  <p class="mt-12 text-muted">
+    Tasten: P spielen · S stopp · R wiederholen · N oder → weiter · E Schluss · 1–9 springen.
+    Nur Form und Akkorde – Text und Melodie kommen von dir.
+  </p>
+  </div>
 <% end %>
