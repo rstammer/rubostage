@@ -27,7 +27,10 @@ module StepListener
     return unless address == ADDRESS
 
     song = Song.find_by(id: song_id)
-    NowPlaying.broadcast(song, index) if song&.ready?
+    return unless song&.ready?
+
+    NowPlaying.current_song_id = index.negative? ? nil : song.id
+    NowPlaying.broadcast(song, index)
   rescue OSC::Malformed
     nil
   end

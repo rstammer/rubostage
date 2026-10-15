@@ -69,4 +69,30 @@ RSpec.describe Groove do
       expect(described_class.new(sheet).code).not_to include("use_osc")
     end
   end
+
+  describe "with an arrangement" do
+    let(:arrangement) do
+      Arrangement.from_h({
+        "sounds" => {"bass" => "tb303", "comp" => "pulse", "pad" => "dark_ambience", "distorted" => true},
+        "sections" => {"Verse" => {"energy" => 3, "kick" => "x...x...x...x..."}}
+      }, sheet)
+    end
+    let(:arranged) { described_class.new(sheet, song_id: 7, osc_port: 4570, arrangement: arrangement) }
+
+    it "plays the arranged patterns and sounds" do
+      expect(arranged.code).to include("use_synth :tb303", "use_synth :pulse", "use_synth :dark_ambience", "with_fx :distortion")
+      expect(arranged.code).to include("[0, 4, 8, 12]")
+    end
+
+    it "is code Sonic Pi will accept" do
+      expect(CodeCheck.problems(arranged.code)).to be_empty
+      expect(CodeCheck.problems(arranged.voices_code)).to be_empty
+    end
+
+    it "can swap only the voices, leaving the conductor and its place in the form" do
+      voices = arranged.voices_code
+      expect(voices).to include("live_loop :drums", "live_loop :bass", "live_loop :comp", "live_loop :pad")
+      expect(voices).not_to include("live_loop :conductor", "set :stage_next", "4.times do")
+    end
+  end
 end

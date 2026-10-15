@@ -19,7 +19,20 @@ class Song < ApplicationRecord
   # Built fresh from the sheet on every play, so songs made before a change to
   # the groove pick it up too.
   def playable_code
-    Groove.new(lead_sheet, song_id: id, osc_port: Rails.application.config.x.osc_port).code
+    groove.code
+  end
+
+  # Just the voices, for swapping in the arrangement while the song plays.
+  def voices_code
+    groove.voices_code
+  end
+
+  def full_arrangement
+    Arrangement.from_h(arrangement, lead_sheet) if arrangement.present?
+  end
+
+  def groove
+    Groove.new(lead_sheet, song_id: id, osc_port: Rails.application.config.x.osc_port, arrangement: full_arrangement)
   end
 
   def display_title

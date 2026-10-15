@@ -6,6 +6,12 @@ class NowPlaying
 
   attr_reader :song, :index
 
+  # The song Sonic Pi last reported a step for. Lives in the server process,
+  # where the listener runs and jobs run inline.
+  class << self
+    attr_accessor :current_song_id
+  end
+
   def self.broadcast(song, index)
     now = new(song, index)
     Turbo::StreamsChannel.broadcast_replace_to(

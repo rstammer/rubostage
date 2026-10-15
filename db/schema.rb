@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_15_173139) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_15_182130) do
   create_table "songs", force: :cascade do |t|
     t.string "request", null: false
     t.string "title"
@@ -23,5 +23,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_173139) do
     t.text "error"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "arrangement"
+    t.string "arrangement_status", default: "none", null: false
   end
 end

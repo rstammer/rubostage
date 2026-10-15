@@ -26,6 +26,10 @@ RSpec.describe GenerateSongJob do
     expect(song.code).to include("use_bpm 122")
   end
 
+  it "asks for the full arrangement once the groove plays" do
+    expect { described_class.perform_now(song) }.to have_enqueued_job(ArrangeSongJob).with(song)
+  end
+
   it "starts playing right away" do
     described_class.perform_now(song)
     expect(Player).to have_received(:play).with(song.reload.playable_code)

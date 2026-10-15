@@ -20,6 +20,12 @@ module Player
     server.stop
   end
 
+  # Runs code next to what plays, without stopping it: redefined live_loops
+  # take over at their next pass.
+  def upgrade(code)
+    server.run(code)
+  end
+
   # Queues a command for the groove's conductor, which reads it at the next
   # section boundary. The number in front tells a new command from one it has
   # already handled.

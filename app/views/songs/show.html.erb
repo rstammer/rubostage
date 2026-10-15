@@ -28,6 +28,10 @@
       <p class="mt-4 text-2xl text-muted">
         Tonart <span class="text-ink"><%= sheet.key %></span> · <span class="text-ink"><%= sheet.bpm %></span> bpm
       </p>
+      <p class="eyebrow mt-3">
+        <%= {"none" => "Einfacher Groove", "pending" => "Einfacher Groove – volles Arrangement kommt …",
+             "ready" => "Volles Arrangement", "failed" => "Einfacher Groove – Arrangement hat nicht geklappt"}[@song.arrangement_status] %>
+      </p>
     </div>
     <div class="flex gap-3">
       <%= button_to song_playback_path(@song), class: primary, data: {hotkey: "p"} do %>
@@ -52,7 +56,7 @@
       <%= button_to song_command_path(@song, kind: "end"), class: "ring-button", data: {hotkey: "e"} do %>
         ⏏ Schluss
       <% end %>
-      <p id="queued" class="text-lg" aria-live="polite"></p>
+      <p id="queued" class="text-lg" aria-live="polite" data-turbo-permanent></p>
     </div>
   </section>
 

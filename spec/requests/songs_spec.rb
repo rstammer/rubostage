@@ -33,6 +33,12 @@ RSpec.describe "Songs", type: :request do
       expect(response.body).to include("C#m", "122", 'id="chord-0-1"', 'id="now_playing"')
     end
 
+    it "says when the full arrangement is on its way" do
+      song = create(:song, :ready, arrangement_status: "pending")
+      get song_path(song)
+      expect(response.body).to include("volles Arrangement kommt")
+    end
+
     it "says it is still working on a pending song" do
       song = create(:song)
       get song_path(song)
