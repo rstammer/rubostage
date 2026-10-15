@@ -45,7 +45,12 @@
 
   <%= turbo_stream_from @song, :now %>
   <section class="mt-10">
-    <%= render "songs/now", now: NowPlaying.new(@song, nil) %>
+    <%# The wrapper keeps the live panel when the page refreshes, e.g. as the
+        arrangement arrives. The panel itself must not be permanent: Turbo
+        would then ignore the streams that replace it. %>
+    <div id="now_playing_frame" data-turbo-permanent>
+      <%= render "songs/now", now: NowPlaying.new(@song, nil) %>
+    </div>
     <div class="mt-4 flex flex-wrap items-center gap-3">
       <%= button_to song_command_path(@song, kind: "repeat"), class: "ring-button", data: {hotkey: "r"} do %>
         ↻ Teil wiederholen

@@ -41,6 +41,13 @@ RSpec.describe NowPlaying do
     expect(html).to include("G#m", "dann", "E", "Bridge", "#chord-1-0", "#form-1")
   end
 
+  # Turbo keeps a permanent element even when a stream replaces it by id, so
+  # the panel must not be permanent itself or it never changes.
+  it "renders a panel that streams can replace" do
+    html = ApplicationController.render(partial: "songs/now", locals: {now: described_class.new(song, 2)})
+    expect(html).not_to include("data-turbo-permanent")
+  end
+
   it "renders the ending" do
     html = ApplicationController.render(partial: "songs/now", locals: {now: described_class.new(song, -1)})
     expect(html).to include("Schluss")
