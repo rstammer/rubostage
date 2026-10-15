@@ -28,7 +28,7 @@ RSpec.describe GenerateSongJob do
 
   it "starts playing right away" do
     described_class.perform_now(song)
-    expect(Player).to have_received(:play).with(song.reload.code)
+    expect(Player).to have_received(:play).with(song.reload.playable_code)
   end
 
   it "keeps the song ready when Sonic Pi is not running" do

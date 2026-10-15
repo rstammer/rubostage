@@ -2,8 +2,12 @@
 # and loops it. Drums, bass, a strummed comp and a pad — enough to carry on its
 # own, nothing that needs more than the chords.
 class Groove
-  def initialize(sheet)
+  # With a song id, the groove reports every chord change to the stage over
+  # OSC, so the lead sheet can follow along.
+  def initialize(sheet, song_id: nil, osc_port: nil)
     @sheet = sheet
+    @song_id = song_id
+    @osc_port = osc_port
   end
 
   # One entry per chord in playing order.
@@ -93,6 +97,7 @@ class Groove
         end
       end
 
+      #{conductor}
       # Defined last, so every voice above is already waiting on :bar when the
       # first cue fires.
       live_loop :clock do
@@ -103,6 +108,21 @@ class Groove
   end
 
   private
+
+  def conductor
+    return "" unless @song_id
+
+    <<~LOOP
+      # Tells the stage which chord is playing.
+      live_loop :conductor, sync: :bar do
+        use_osc "127.0.0.1", #{@osc_port}
+        steps.each_with_index do |(_root, _voicing, beats), index|
+          osc "/stage/step", #{@song_id}, index
+          sleep beats
+        end
+      end
+    LOOP
+  end
 
   def steps_literal
     timeline.map { |s| "  [#{s[:bass]}, #{s[:voicing].inspect}, #{s[:beats]}], # #{s[:section]}: #{s[:chord]}" }

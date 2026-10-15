@@ -5,7 +5,7 @@ class PlaybacksController < ApplicationController
 
   def create
     song = Song.find(params[:song_id])
-    Player.play(song.code)
+    Player.play(song.playable_code)
     redirect_to song
   end
 

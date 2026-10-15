@@ -1,0 +1,15 @@
+<div id="now_playing" class="rounded-3xl border-2 border-ink bg-card p-6 sm:p-10">
+  <% if now.playing? %>
+    <p class="eyebrow"><%= now.section %></p>
+    <div class="mt-2 flex flex-wrap items-baseline gap-x-10 gap-y-2">
+      <span class="text-8xl leading-none font-semibold tracking-tight sm:text-[10rem]"><%= now.chord %></span>
+      <span class="text-3xl text-muted sm:text-5xl">dann <span class="text-ink"><%= now.next_chord %></span></span>
+    </div>
+    <style>
+      #<%= now.sheet_id %> { background: var(--ink); color: var(--paper); border-radius: 0.5rem; padding: 0 0.35rem; }
+    </style>
+  <% else %>
+    <p class="eyebrow">Jetzt</p>
+    <p class="mt-3 text-3xl text-muted sm:text-4xl">Sobald es läuft, steht hier der Akkord.</p>
+  <% end %>
+</div>

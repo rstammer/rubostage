@@ -30,7 +30,7 @@ RSpec.describe "Songs", type: :request do
     it "shows the chords of a ready song" do
       song = create(:song, :ready)
       get song_path(song)
-      expect(response.body).to include("C#m", "122")
+      expect(response.body).to include("C#m", "122", 'id="chord-0-1"', 'id="now_playing"')
     end
 
     it "says it is still working on a pending song" do
@@ -46,7 +46,7 @@ RSpec.describe "Songs", type: :request do
     it "plays a song" do
       allow(Player).to receive(:play)
       post song_playback_path(song)
-      expect(Player).to have_received(:play).with(song.code)
+      expect(Player).to have_received(:play).with(song.playable_code)
       expect(response).to redirect_to(song_path(song))
     end
 

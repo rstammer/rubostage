@@ -37,6 +37,11 @@
     </div>
   </div>
 
+  <%= turbo_stream_from @song, :now %>
+  <section class="mt-10">
+    <%= render "songs/now", now: NowPlaying.new(@song, nil) %>
+  </section>
+
   <section class="mt-12">
     <h2 class="eyebrow">Ablauf</h2>
     <ol class="mt-3 flex flex-wrap gap-2">
@@ -47,13 +52,17 @@
   </section>
 
   <section class="mt-12 grid gap-6 md:grid-cols-2">
-    <% sheet.sections.each do |section| %>
+    <% sheet.sections.each_with_index do |section, section_index| %>
       <article class="rounded-3xl border-2 border-ink bg-card p-5 sm:p-7">
         <h3 class="eyebrow"><%= section.name %></h3>
         <div class="mt-4 grid grid-cols-4 border-l-2 border-ink/30">
+          <% position = 0 %>
           <% section.bars.each do |bar| %>
             <div class="flex min-w-0 flex-wrap items-baseline gap-x-2 border-r-2 border-ink/30 px-2 py-3 text-2xl font-semibold sm:px-3 xl:text-3xl">
-              <% bar.each do |chord| %><span><%= chord %></span><% end %>
+              <% bar.each do |chord| %>
+                <span id="chord-<%= section_index %>-<%= position %>"><%= chord %></span>
+                <% position += 1 %>
+              <% end %>
             </div>
           <% end %>
         </div>

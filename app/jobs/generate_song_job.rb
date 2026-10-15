@@ -21,7 +21,7 @@ class GenerateSongJob < ApplicationJob
   # Sonic Pi being closed is no reason to lose the song: it stays ready and
   # can be started from the page.
   def play(song)
-    Player.play(song.code)
+    Player.play(song.playable_code)
   rescue Player::NotRunning
     nil
   end
