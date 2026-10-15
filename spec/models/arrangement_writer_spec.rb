@@ -26,6 +26,11 @@ RSpec.describe ArrangementWriter do
     expect(client.prompt).to include("Starlight", "Muse", "122", "Verse", "B | C#m")
   end
 
+  it "offers the groove styles and guitar parts it can play" do
+    described_class.new(client: client).call(sheet)
+    expect(client.prompt).to include("halftime", "shuffle", "four_floor", "palm", "power")
+  end
+
   it "asks for original parts, not a transcription of the record" do
     described_class.new(client: client).call(sheet)
     expect(client.prompt).to match(/own patterns/i)

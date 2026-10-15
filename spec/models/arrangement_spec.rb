@@ -76,4 +76,39 @@ RSpec.describe Arrangement do
     a = arrangement
     expect(described_class.from_h(a.to_h, sheet).to_h).to eq(a.to_h)
   end
+
+  describe "groove and playing style" do
+    it "reads a groove style, swing, fill and how the guitar plays" do
+      part = arrangement("sections" => {"Verse" => {"groove" => "halftime", "swing" => 0.2, "fill" => true, "guitar" => "palm"}}).section("Verse")
+      expect(part.groove).to eq(:halftime)
+      expect(part.swing).to eq(0.2)
+      expect(part.fill).to be(true)
+      expect(part.guitar).to eq(:palm)
+    end
+
+    it "plays the drum patterns it was given when no style is named" do
+      expect(arrangement.section("Verse").groove).to eq(:custom)
+    end
+
+    it "plays rock when it knows neither style nor patterns" do
+      a = described_class.from_h({"sections" => {}}, sheet)
+      expect(a.section("Verse").groove).to eq(:rock)
+    end
+
+    it "falls back for a style or guitar it does not know" do
+      part = arrangement("sections" => {"Verse" => {"groove" => "polka", "guitar" => "banjo"}}).section("Verse")
+      expect(part.groove).to eq(:custom)
+      expect(part.guitar).to eq(:power)
+    end
+
+    it "takes the style's swing when none is given and keeps it musical" do
+      expect(arrangement("sections" => {"Verse" => {"groove" => "shuffle"}}).section("Verse").swing).to eq(DrumGroove.default_swing(:shuffle))
+      expect(arrangement("sections" => {"Verse" => {"swing" => 5}}).section("Verse").swing).to eq(0.33)
+    end
+
+    it "strums instead of power chords when the guitar is not distorted" do
+      a = arrangement("sounds" => {"distorted" => false}, "sections" => {"Verse" => {"guitar" => nil}})
+      expect(a.section("Verse").guitar).to eq(:strum)
+    end
+  end
 end

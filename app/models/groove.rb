@@ -73,13 +73,14 @@ class Groove
       # Per section: which chord sounds on each beat, as an index into its chords
       beats_at = #{beat_maps.inspect}
 
-      # Per section: energy and sixteen-step patterns (step numbers within a bar)
+      # Per section: energy, swing, guitar part and patterns. Drums are [step,
+      # velocity] within a bar; bass is [step, interval]; comp is the guitar rhythm.
       parts = [
       #{parts_literal}
       ]
 
       # Loudness per energy level
-      levels = [0, 0.6, 0.8, 1.0]
+      levels = [0, 0.4, 0.6, 0.8]
     RUBY
   end
 
@@ -175,26 +176,47 @@ class Groove
 
   def arranged_voices
     sounds = @arrangement.sounds
-    comp_open = sounds[:distorted] ? "with_fx :distortion, distort: 0.6 do" : "with_fx :reverb, room: 0.5, mix: 0.25 do"
     <<~RUBY
+      # Offbeat eighths (step 2 of every beat) come late by the section's swing.
       live_loop :drums do
         pos = sync(:section)[0]
         if pos < 0
-          sample :drum_splash_hard, amp: 0.6
-          sample :drum_bass_hard, amp: 0.9
+          sample :drum_cymbal_hard, amp: 0.7
+          sample :drum_heavy_kick, amp: 0.9
           stop
         end
         part = parts[form[pos]]
         level = levels[part[:energy]]
-        sample :drum_splash_hard, amp: 0.4 * level if part[:energy] == 3
-        (beats_at[form[pos]].length * 4).times do |slot|
+        sample :drum_cymbal_hard, amp: 0.5 * level if part[:energy] > 1
+        slots = beats_at[form[pos]].length * 4
+        slots.times do |slot|
           step = slot % 16
-          sample :drum_bass_hard, amp: 0.8 * level if part[:kick].include?(step)
-          sample :drum_snare_hard, amp: 0.7 * level if part[:snare].include?(step)
-          if part[:open_hat].include?(step)
-            sample :drum_cymbal_open, amp: 0.3 * level, sustain: 0.1, release: 0.2
-          elsif part[:hat].include?(step)
-            sample :drum_cymbal_closed, amp: ((step % 4 == 0) ? 0.3 : 0.16) * level
+          late = (step % 4 == 2) ? part[:swing] * 0.5 : 0
+          time_warp late do
+            if part[:fill] && slot >= slots - 8
+              # Tom fill over the last two beats, down the kit.
+              toms = [:drum_tom_hi_hard, :drum_tom_hi_hard, :drum_tom_mid_hard, :drum_tom_mid_hard,
+                :drum_tom_lo_hard, :drum_tom_lo_hard, :drum_snare_hard, :drum_snare_hard]
+              sample toms[slot - (slots - 8)], amp: 0.75 * level
+            else
+              kick = part[:kick].find { |s, _vel| s == step }
+              if kick
+                sample :drum_bass_hard, amp: 0.85 * kick[1] * level
+                sample :drum_heavy_kick, amp: 0.4 * kick[1] * level if part[:energy] == 3
+              end
+              snare = part[:snare].find { |s, _vel| s == step }
+              if snare
+                sample :drum_snare_hard, amp: 0.75 * snare[1] * level
+                sample :sn_dolf, amp: 0.25 * snare[1] * level if snare[1] > 0.5
+              end
+              open_hat = part[:open_hat].find { |s, _vel| s == step }
+              hat = part[:hat].find { |s, _vel| s == step }
+              if open_hat
+                sample :drum_cymbal_open, amp: 0.3 * open_hat[1] * level, sustain: 0.1, release: 0.25
+              elsif hat
+                sample :drum_cymbal_closed, amp: 0.3 * hat[1] * level
+              end
+            end
           end
           sleep 0.25
         end
@@ -210,31 +232,65 @@ class Groove
         part = parts[form[pos]]
         chords = sections[form[pos]]
         at = beats_at[form[pos]]
-        with_fx :lpf, cutoff: 95 do
+        with_fx :lpf, cutoff: [0, 75, 90, 100][part[:energy]] do
           (at.length * 4).times do |slot|
-            hit = part[:bass].find { |s, _interval| s == slot % 16 }
-            play chords[at[slot / 4]][0] + hit[1], release: 0.3, amp: 0.55 * levels[part[:energy]] if hit
+            step = slot % 16
+            hit = part[:bass].find { |s, _interval| s == step }
+            if hit
+              late = (step % 4 == 2) ? part[:swing] * 0.5 : 0
+              time_warp late do
+                play chords[at[slot / 4]][0] + hit[1], release: 0.3, amp: 0.6 * levels[part[:energy]]
+              end
+            end
             sleep 0.25
           end
         end
       end
 
+      # The guitar part: distorted power chords (root, fifth, octave), palm
+      # mutes, an open strum, short stabs, or nothing. One detuned saw per note
+      # gives the width a doubled take would; two would overload the engine.
       live_loop :comp do
         pos = sync(:section)[0]
-        use_synth :#{sounds[:comp]}
         if pos < 0
-          play final[1], amp: 0.35, release: 3
+          use_synth :pluck
+          final[1].each { |n| play n, amp: 0.4, release: 3 }
           stop
         end
         part = parts[form[pos]]
+        level = levels[part[:energy]]
         chords = sections[form[pos]]
         at = beats_at[form[pos]]
-        #{comp_open}
-          (at.length * 4).times do |slot|
-            if part[:comp].include?(slot % 16)
-              play chords[at[slot / 4]][1], release: 0.25, amp: 0.3 * levels[part[:energy]]
+        dirty = [:power, :palm].include?(part[:guitar])
+        with_fx :distortion, distort: 0.85, mix: (dirty ? 1 : 0) do
+          with_fx :lpf, cutoff: ((part[:guitar] == :palm) ? 72 : 100) do
+            (at.length * 4).times do |slot|
+              step = slot % 16
+              if part[:comp].include?(step) && part[:guitar] != :none
+                root = chords[at[slot / 4]][0]
+                voicing = chords[at[slot / 4]][1]
+                late = (step % 4 == 2) ? part[:swing] * 0.5 : 0
+                time_warp late do
+                  case part[:guitar]
+                  when :power, :palm
+                    hold = (part[:guitar] == :palm) ? 0.12 : 0.45
+                    use_synth :dsaw
+                    play [root + 12, root + 19, root + 24], release: hold, amp: 0.25 * level, detune: 0.15
+                  when :strum
+                    use_synth :pluck
+                    voicing.each_with_index do |n, i|
+                      time_warp i * 0.02 do
+                        play n, amp: 0.4 * level, release: 1
+                      end
+                    end
+                  when :stabs
+                    use_synth :#{sounds[:comp]}
+                    play voicing, release: 0.15, amp: 0.3 * level
+                  end
+                end
+              end
+              sleep 0.25
             end
-            sleep 0.25
           end
         end
       end
@@ -243,13 +299,13 @@ class Groove
         pos = sync(:section)[0]
         use_synth :#{sounds[:pad]}
         if pos < 0
-          play final[1], attack: 0.1, release: 4, amp: 0.25, cutoff: 90
+          play final[1], attack: 0.1, release: 4, amp: 0.2, cutoff: 90
           stop
         end
         part = parts[form[pos]]
         with_fx :reverb, room: 0.8, mix: 0.4 do
           sections[form[pos]].each do |_root, voicing, beats|
-            play voicing, attack: 0.2, release: beats * 0.95, amp: 0.25 * levels[part[:energy]], cutoff: 90 if part[:pad]
+            play voicing, attack: 0.2, release: beats * 0.95, amp: 0.18 * levels[part[:energy]], cutoff: 90 if part[:pad]
             sleep beats
           end
         end
@@ -309,9 +365,11 @@ class Groove
   def parts_literal
     @sheet.sections.map do |section|
       part = @arrangement.section(section.name)
-      "  {energy: #{part.energy}, kick: #{part.kick.inspect}, snare: #{part.snare.inspect}, " \
-        "hat: #{part.hat.inspect}, open_hat: #{part.open_hat.inspect}, bass: #{part.bass.inspect}, " \
-        "comp: #{part.comp.inspect}, pad: #{part.pad}}, # #{section.name}"
+      drums = part.drum_hits
+      "  {energy: #{part.energy}, swing: #{part.swing}, fill: #{part.fill}, guitar: :#{part.guitar},\n" \
+        "   kick: #{drums[:kick].inspect}, snare: #{drums[:snare].inspect},\n" \
+        "   hat: #{drums[:hat].inspect}, open_hat: #{drums[:open_hat].inspect},\n" \
+        "   bass: #{part.bass.inspect}, comp: #{part.comp.inspect}, pad: #{part.pad}}, # #{section.name}"
     end.join("\n")
   end
 

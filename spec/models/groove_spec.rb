@@ -89,6 +89,27 @@ RSpec.describe Groove do
       expect(CodeCheck.problems(arranged.voices_code)).to be_empty
     end
 
+    it "plays power chords on one detuned saw through distortion" do
+      expect(arranged.code).to include("use_synth :dsaw", "with_fx :distortion")
+      expect(arranged.code).not_to include("pan: -0.7", "use_synth :saw\n")
+    end
+
+    it "leaves headroom at full energy" do
+      expect(arranged.code).to include("levels = [0, 0.4, 0.6, 0.8]")
+    end
+
+    it "swings the offbeats with time_warp" do
+      expect(arranged.code).to include("time_warp late do")
+    end
+
+    it "plays a tom fill in the last bar when a section asks for one" do
+      expect(arranged.code).to include("drum_tom_hi_hard", "drum_tom_lo_hard")
+    end
+
+    it "crashes into loud sections" do
+      expect(arranged.code).to include("drum_cymbal_hard")
+    end
+
     it "can swap only the voices, leaving the conductor and its place in the form" do
       voices = arranged.voices_code
       expect(voices).to include("live_loop :drums", "live_loop :bass", "live_loop :comp", "live_loop :pad")

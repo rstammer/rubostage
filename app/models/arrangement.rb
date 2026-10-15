@@ -32,7 +32,7 @@ class Arrangement
     sounds[:distorted] = given["distorted"] == true
 
     sections = data["sections"].to_h
-    parts = sheet.sections.to_h { |s| [s.name, Arrangement::Part.from_h(sections[s.name])] }
+    parts = sheet.sections.to_h { |s| [s.name, Arrangement::Part.from_h(sections[s.name], distorted: sounds[:distorted])] }
     new(sounds, parts)
   end
 
