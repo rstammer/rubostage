@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/*
+  Warm paper, dark ink, an editorial serif. Fonts are system fonts on purpose:
+  the stage runs offline on the street, so nothing is loaded from the web.
+*/
+:root {
+  --paper: #fbf6ee;
+  --card: #fffdf8;
+  --ink: #241f2c;
+  --muted: #6b6375;
+  --accent: #b3412e;
+  --accent-ink: #fffdf8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #17141c;
+    --card: #1f1b26;
+    --ink: #f3ece2;
+    --muted: #a39bad;
+    --accent: #e3765f;
+    --accent-ink: #17141c;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #17141c;
+  --card: #1f1b26;
+  --ink: #f3ece2;
+  --muted: #a39bad;
+  --accent: #e3765f;
+  --accent-ink: #17141c;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --font-serif: "Iowan Old Style", "Charter", "Palatino", Georgia, serif;
+}
+
+@layer base {
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-serif);
+  }
+}
+
+@utility eyebrow {
+  font-size: 0.875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@utility ring-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid var(--ink);
+  border-radius: 9999px;
+  padding: 0.6rem 1.4rem;
+  font-size: 1.125rem;
+  transition: background-color 120ms, color 120ms;
+  &:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+}
