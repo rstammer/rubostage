@@ -1,36 +1,37 @@
 @import "tailwindcss";
 
 /*
-  Warm paper, dark ink, an editorial serif. Fonts are system fonts on purpose:
-  the stage runs offline on the street, so nothing is loaded from the web.
+  Pale sage, deep petrol, an amber spotlight and an editorial serif. Fonts
+  are system fonts on purpose: the stage runs offline on the street, so
+  nothing is loaded from the web.
 */
 :root {
-  --paper: #fbf6ee;
-  --card: #fffdf8;
-  --ink: #241f2c;
-  --muted: #6b6375;
-  --accent: #b3412e;
-  --accent-ink: #fffdf8;
+  --paper: #eceeea;
+  --card: #f7f8f5;
+  --ink: #13282d;
+  --muted: #5b6e71;
+  --accent: #e0962a;
+  --accent-ink: #13282d;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #17141c;
-    --card: #1f1b26;
-    --ink: #f3ece2;
-    --muted: #a39bad;
-    --accent: #e3765f;
-    --accent-ink: #17141c;
+    --paper: #0e1b1f;
+    --card: #142529;
+    --ink: #e6eee9;
+    --muted: #8fa3a3;
+    --accent: #f2b544;
+    --accent-ink: #0e1b1f;
   }
 }
 
 :root[data-theme="dark"] {
-  --paper: #17141c;
-  --card: #1f1b26;
-  --ink: #f3ece2;
-  --muted: #a39bad;
-  --accent: #e3765f;
-  --accent-ink: #17141c;
+  --paper: #0e1b1f;
+  --card: #142529;
+  --ink: #e6eee9;
+  --muted: #8fa3a3;
+  --accent: #f2b544;
+  --accent-ink: #0e1b1f;
 }
 
 @theme inline {

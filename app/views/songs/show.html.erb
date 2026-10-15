@@ -14,7 +14,7 @@
 <% elsif @song.failed? %>
   <p class="eyebrow">Hat nicht geklappt</p>
   <h1 class="mt-4 text-5xl font-semibold tracking-tight sm:text-7xl"><%= @song.request %></h1>
-  <p class="mt-6 max-w-2xl rounded-2xl border-2 border-accent px-5 py-4 text-lg text-accent"><%= @song.error %></p>
+  <p class="mt-6 max-w-2xl rounded-2xl border-2 border-accent bg-accent/15 px-5 py-4 text-lg"><%= @song.error %></p>
   <%= link_to "← Anderen Song nennen", root_path, class: "ring-button mt-8" %>
 
 <% else %>

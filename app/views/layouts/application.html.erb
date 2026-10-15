@@ -16,7 +16,7 @@
   </head>
 
   <body class="min-h-screen" data-controller="theme">
-    <header class="border-b-4 border-double border-ink">
+    <header class="border-b-4 border-accent">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-8">
         <%= link_to root_path, class: "flex items-baseline gap-3" do %>
           <span class="text-2xl font-semibold tracking-tight sm:text-3xl">mcblinded</span>
@@ -33,7 +33,7 @@
 
     <main class="mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16">
       <% if flash[:alert] %>
-        <p class="mb-8 rounded-2xl border-2 border-accent px-5 py-4 text-lg text-accent"><%= flash[:alert] %></p>
+        <p class="mb-8 rounded-2xl border-2 border-accent bg-accent/15 px-5 py-4 text-lg"><%= flash[:alert] %></p>
       <% end %>
       <%= yield %>
     </main>
