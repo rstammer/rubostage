@@ -9,6 +9,9 @@
 # section boundary, so the voices never fall out of step. The same split lets
 # stage two swap the voices while the conductor keeps its place in the form.
 class Groove
+  # Loudness per energy level, 1 to 3
+  LEVELS = [0, 0.4, 0.6, 0.8].freeze
+
   # With a song id, the groove reports every chord change to the stage over
   # OSC, so the lead sheet can follow along.
   def initialize(sheet, song_id: nil, osc_port: nil, arrangement: nil, riffs: nil)
@@ -85,7 +88,7 @@ class Groove
       ]
 
       # Loudness per energy level
-      levels = [0, 0.4, 0.6, 0.8]
+      levels = #{LEVELS.inspect}
     RUBY
   end
 
@@ -322,8 +325,8 @@ class Groove
   def riffs_data
     <<~RUBY
 
-      # Per section: the riff from its tab as [length in steps, swing, notes],
-      # each note [step, pitch, steps held]; nil where there is no tab.
+      # Per section: the riff from its tab as [length in steps, swing, loudness,
+      # notes], each note [step, pitch, steps held]; nil where there is no tab.
       riffs = [
       #{riffs_literal}
       ]
@@ -341,12 +344,12 @@ class Groove
         riff = riffs[form[pos]]
         if riff
           use_synth :#{crunch ? "dsaw" : "pluck"}
-          with_fx #{crunch ? ":distortion, distort: 0.8" : ":reverb, room: 0.4, mix: 0.2"} do
+          with_fx #{crunch ? ":distortion, distort: 0.8, amp: 0.3 * riff[2]" : ":reverb, room: 0.4, mix: 0.2, amp: riff[2]"} do
             with_fx :lpf, cutoff: 100 do
               (sections[form[pos]].sum { |entry| entry[2] } * 4).times do |slot|
                 step = slot % riff[0]
                 late = (step % 4 == 2) ? riff[1] * 0.5 : 0
-                riff[2].each do |hit_step, pitch, held|
+                riff[3].each do |hit_step, pitch, held|
                   next unless hit_step == step
                   time_warp late do
                     if held == 0
@@ -430,8 +433,10 @@ class Groove
       tab = @riffs.tab(section.name)
       next "  nil, # #{section.name}" unless tab
 
-      swing = @arrangement ? @arrangement.section(section.name).swing : 0
-      "  [#{tab.steps}, #{swing}, #{tab.notes.inspect}], # #{section.name}"
+      part = @arrangement&.section(section.name)
+      swing = part ? part.swing : 0
+      level = LEVELS[part ? part.energy : 2]
+      "  [#{tab.steps}, #{swing}, #{level}, #{tab.notes.inspect}], # #{section.name}"
     end.join("\n")
   end
 

@@ -131,8 +131,8 @@ RSpec.describe Groove do
     let(:riffs) { RiffTrack.from_h({"tone" => "clean", "tabs" => {"Verse" => verse_tab}}) }
     let(:with_riffs) { described_class.new(sheet, song_id: 7, osc_port: 4570, riffs: riffs) }
 
-    it "writes each section's riff as its length and [step, pitch, steps held]" do
-      expect(with_riffs.code).to include("[16, 0, [[0, 40, 2], [2, 40, 0], [4, 40, 8], [8, 47, 8], [12, 43, 4]]], # Verse")
+    it "writes each section's riff as its length, swing, loudness and [step, pitch, steps held]" do
+      expect(with_riffs.code).to include("[16, 0, 0.6, [[0, 40, 2], [2, 40, 0], [4, 40, 8], [8, 47, 8], [12, 43, 4]]], # Verse")
       expect(with_riffs.code).to include("nil, # Bridge")
     end
 
@@ -150,7 +150,24 @@ RSpec.describe Groove do
     it "swings with the arrangement" do
       arrangement = Arrangement.from_h({"sections" => {"Verse" => {"groove" => "shuffle"}}}, sheet)
       code = described_class.new(sheet, riffs: riffs, arrangement: arrangement).code
-      expect(code).to include("[16, #{DrumGroove.default_swing(:shuffle)}, [[0, 40, 2]")
+      expect(code).to include("[16, #{DrumGroove.default_swing(:shuffle)}, 0.6, [[0, 40, 2]")
+    end
+
+    it "gets as loud as the arrangement's energy for the section" do
+      arrangement = Arrangement.from_h({"sections" => {"Verse" => {"energy" => 1}}}, sheet)
+      code = described_class.new(sheet, riffs: riffs, arrangement: arrangement).code
+      expect(code).to include("[16, 0, 0.4, [[0, 40, 2]")
+    end
+
+    it "turns crunch down after the distortion, which evens out whatever goes in" do
+      crunchy = RiffTrack.from_h({"tabs" => {"Verse" => verse_tab}})
+      code = described_class.new(sheet, riffs: crunchy).code
+      expect(code[code.index("live_loop :riff")..]).to include("with_fx :distortion, distort: 0.8, amp: 0.3 * riff[2]")
+    end
+
+    it "plays clean riffs as loud as the section" do
+      voice = with_riffs.code[with_riffs.code.index("live_loop :riff")..]
+      expect(voice).to include("with_fx :reverb, room: 0.4, mix: 0.2, amp: riff[2]")
     end
 
     it "is code Sonic Pi will accept, also when swapped in" do
