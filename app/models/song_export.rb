@@ -13,7 +13,7 @@ class SongExport
   FILES = %w[live.rb NOTES.md].freeze
 
   def self.default_root
-    Rails.application.config.x.songs_root || Rails.root.join("../songs")
+    Rails.application.config.x.songs_root
   end
 
   def initialize(song, root: self.class.default_root)

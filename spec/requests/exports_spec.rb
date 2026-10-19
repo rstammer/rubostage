@@ -2,12 +2,13 @@ require "rails_helper"
 
 RSpec.describe "Exports", type: :request do
   around do |example|
+    before = Rails.application.config.x.songs_root
     Dir.mktmpdir do |root|
       Rails.application.config.x.songs_root = Pathname(root)
       @root = Pathname(root)
       example.run
     ensure
-      Rails.application.config.x.songs_root = nil
+      Rails.application.config.x.songs_root = before
     end
   end
 

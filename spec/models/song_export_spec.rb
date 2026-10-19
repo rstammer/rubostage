@@ -9,6 +9,10 @@ RSpec.describe SongExport do
   let(:export) { described_class.new(song, root: @root) }
   let(:dir) { @root.join("starlight") }
 
+  it "writes into the repo's songs folder unless told otherwise" do
+    expect(described_class.default_root.to_s).to eq(Rails.root.join("../songs").to_s)
+  end
+
   it "names the folder after the title, the way the songs folder does" do
     song.update!(sheet: song.sheet.merge("title" => "Chop Suey!"))
     expect(described_class.new(song, root: @root).dir).to eq(@root.join("chop_suey"))
