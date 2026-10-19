@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   resources :songs, only: [:index, :create, :show, :edit, :update] do
     resource :playback, only: :create
     resource :command, only: :create
+    resource :export, only: :create
   end
   resource :playback, only: :destroy
 end

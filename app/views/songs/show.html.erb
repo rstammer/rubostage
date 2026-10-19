@@ -41,6 +41,10 @@
         ■ Stopp
       <% end %>
       <%= link_to "✎ Bearbeiten", edit_song_path(@song), class: "ring-button" %>
+      <%= button_to song_export_path(@song), class: "ring-button",
+            title: "Schreibt live.rb und NOTES.md nach songs/ im Repo" do %>
+        ⤓ Ins Repo
+      <% end %>
     </div>
   </div>
 
