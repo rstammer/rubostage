@@ -1,5 +1,4 @@
 require "rails_helper"
-require Rails.root.join("../lib/osc").to_s
 
 RSpec.describe OSC do
   it "reads back a message it built" do

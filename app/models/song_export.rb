@@ -1,4 +1,4 @@
-# Takes a song from the stage into the repo, as songs/<song>/live.rb and
+# Takes a song from the stage into a band's repo, as <songs>/<song>/live.rb and
 # NOTES.md, so it plays with bin/play and lives on without the app.
 #
 # Both files carry a mark in their first line. A file with the mark came from
@@ -8,8 +8,8 @@
 class SongExport
   class HandWritten < StandardError; end
 
-  MARK = "# Exported from the mcblinded stage."
-  MARK_MD = "<!-- Exported from the mcblinded stage."
+  MARK = "# Exported from rubostage."
+  MARK_MD = "<!-- Exported from rubostage."
   FILES = %w[live.rb NOTES.md].freeze
 
   def self.default_root
@@ -26,9 +26,9 @@ class SongExport
     @root.join(@sheet.title.parameterize(separator: "_"))
   end
 
-  # The folder as the repo knows it, e.g. "songs/starlight".
+  # The folder as the band's repo knows it, e.g. "songs/starlight".
   def path
-    "songs/#{dir.basename}"
+    "#{@root.basename}/#{dir.basename}"
   end
 
   def call
@@ -77,7 +77,7 @@ class SongExport
       #{MARK_MD} The next export overwrites this file; to work on it by hand, take this line out first. -->
       # #{@sheet.title}
 
-      Cover von **#{@sheet.artist} — „#{@sheet.title}"**, aus der mcblinded-Stage übernommen.
+      Cover von **#{@sheet.artist} — „#{@sheet.title}"**, aus rubostage übernommen.
 
       > Tonart, Tempo, Form und Akkorde hat die KI aus dem Gedächtnis geschrieben —
       > **ungeprüft**, nach Gehör gegenchecken. Der Songtext liegt bewusst nicht im Repo.

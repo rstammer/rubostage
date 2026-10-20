@@ -1,5 +1,4 @@
 require "rails_helper"
-require Rails.root.join("../lib/osc").to_s
 
 RSpec.describe StepListener do
   let(:song) { create(:song, :ready) }

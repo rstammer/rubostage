@@ -1,5 +1,4 @@
 require "rails_helper"
-require Rails.root.join("../lib/sonic_pi").to_s
 
 RSpec.describe SonicPi do
   # Stands in for the Sonic Pi server: a UDP socket on a free local port.

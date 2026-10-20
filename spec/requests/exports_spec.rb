@@ -4,8 +4,8 @@ RSpec.describe "Exports", type: :request do
   around do |example|
     before = Rails.application.config.x.songs_root
     Dir.mktmpdir do |root|
-      Rails.application.config.x.songs_root = Pathname(root)
-      @root = Pathname(root)
+      @root = Pathname(root).join("songs")
+      Rails.application.config.x.songs_root = @root
       example.run
     ensure
       Rails.application.config.x.songs_root = before

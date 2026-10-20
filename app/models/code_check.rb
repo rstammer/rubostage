@@ -1,6 +1,6 @@
 # Catches what would make Sonic Pi throw a whole run away before it is sent:
 # syntax errors, and built-in fn names used as variables (Sonic Pi refuses the
-# buffer with a PreParseError, see ../CLAUDE.md).
+# buffer with a PreParseError, see CLAUDE.md).
 module CodeCheck
   BUILT_INS = %w[
     beat choose chord cue dice knit line look note play range rand ring sample

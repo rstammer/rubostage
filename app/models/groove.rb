@@ -44,7 +44,7 @@ class Groove
     <<~RUBY
       # #{@sheet.title} — #{@sheet.artist}
       #
-      # #{@arrangement ? "Arranged" : "A groove"} from the mcblinded stage. Key #{@sheet.key}, #{@sheet.bpm} BPM.
+      # #{@arrangement ? "Arranged" : "A groove"} from rubostage. Key #{@sheet.key}, #{@sheet.bpm} BPM.
       # Form: #{@sheet.form.join(" – ")}.
       #
       # use_bpm sits above the live_loops: it is thread-local, and loops inherit

@@ -1,6 +1,4 @@
-require Rails.root.join("../lib/sonic_pi").to_s
-
-# The app's way to Sonic Pi, through the same client bin/play uses.
+# The app's way to Sonic Pi, through the SonicPi client in lib/.
 module Player
   class NotRunning < StandardError; end
 

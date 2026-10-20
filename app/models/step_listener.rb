@@ -1,5 +1,4 @@
 require "socket"
-require Rails.root.join("../lib/osc").to_s
 
 # Hears the chord changes Sonic Pi reports (see Groove) and hands them to the
 # song's page. Runs as a thread inside the server process, so the in-process

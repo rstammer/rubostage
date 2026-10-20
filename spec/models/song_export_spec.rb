@@ -9,8 +9,13 @@ RSpec.describe SongExport do
   let(:export) { described_class.new(song, root: @root) }
   let(:dir) { @root.join("starlight") }
 
-  it "writes into the repo's songs folder unless told otherwise" do
-    expect(described_class.default_root.to_s).to eq(Rails.root.join("../songs").to_s)
+  it "writes into the app's exports folder unless SONGS_ROOT says otherwise" do
+    expect(described_class.default_root.to_s).to eq(Rails.root.join("exports").to_s)
+  end
+
+  it "names the path after the folder it writes into" do
+    exports = @root.join("exports")
+    expect(described_class.new(song, root: exports).path).to eq("exports/starlight")
   end
 
   it "names the folder after the title, the way the songs folder does" do

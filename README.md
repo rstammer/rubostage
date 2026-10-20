@@ -1,24 +1,45 @@
-# README
+# rubostage
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Name a song, get a play-along. rubostage asks an AI for key, tempo, form and
+chords, starts a groove in Sonic Pi right away, then swaps in a full
+arrangement while it plays. The lead sheet follows the music: current chord
+big, next one small, current section marked.
 
-Things you may want to cover:
+Built for busking: someone calls out a song, the app plays the band, you sing
+and play guitar on top.
 
-* Ruby version
+## Requirements
 
-* System dependencies
+- Ruby (see `.ruby-version`), SQLite
+- [Sonic Pi](https://sonic-pi.net) 5 — the app must be running, it brings the server
+- `claude` CLI, logged in (used via `claude -p`, no API key)
 
-* Configuration
+## Running
 
-* Database creation
+```bash
+bundle install
+bin/rails db:prepare
+tail -f /dev/null | PORT=4567 bin/dev
+```
 
-* Database initialization
+Open http://localhost:4567. `tail -f /dev/null` keeps stdin open; without it
+`tailwindcss:watch` exits and foreman takes everything down with it.
 
-* How to run the test suite
+## Exporting songs
 
-* Services (job queues, cache servers, search engines, etc.)
+"⤓ Ins Repo" writes a song as `<songs>/<song>/live.rb` plus `NOTES.md`. The
+`live.rb` plays without the app. Point `SONGS_ROOT` at a band's songs folder:
 
-* Deployment instructions
+```bash
+SONGS_ROOT=../mcblinded/songs PORT=4567 bin/dev
+```
 
-* ...
+Without it, songs land in `exports/` (gitignored). Files without the export
+mark in their first line count as hand-written and are never overwritten.
+
+## Tests
+
+```bash
+bundle exec rspec
+bundle exec standardrb
+```
