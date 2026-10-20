@@ -29,6 +29,7 @@ module StepListener
     return unless song&.ready?
 
     NowPlaying.current_song_id = index.negative? ? nil : song.id
+    NowPlaying.last_step_at = Time.current
     NowPlaying.broadcast(song, index)
   rescue OSC::Malformed
     nil

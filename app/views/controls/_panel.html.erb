@@ -1,0 +1,28 @@
+<%= turbo_frame_tag "controls" do %>
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-2 px-4 py-2.5 sm:px-8"
+       data-controller="poll" data-poll-url-value="<%= controls_path %>">
+    <div class="flex items-center gap-3">
+      <span class="lamp <%= {ready: "lamp-on", starting: "lamp-blink"}[panel.sonic_pi] %>" aria-hidden="true"></span>
+      <span class="panel-label">Sonic Pi</span>
+      <% if panel.sonic_pi == :off %>
+        <%= button_to "Starten", sonic_pi_path, class: "panel-button" %>
+      <% elsif panel.sonic_pi == :starting %>
+        <span class="panel-label opacity-60">startet …</span>
+      <% end %>
+    </div>
+
+    <% song = panel.song %>
+    <div class="flex min-w-0 items-center gap-3">
+      <span class="lamp <%= "lamp-on" if song %>" aria-hidden="true"></span>
+      <span class="panel-label">Song</span>
+      <% if song %>
+        <%= link_to song.display_title, song_path(song), class: "truncate text-sm text-panel-ink hover:underline", data: {turbo_frame: "_top"} %>
+      <% end %>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <span class="lamp <%= "lamp-on" if panel.thinking? %>" aria-hidden="true"></span>
+      <span class="panel-label">KI</span>
+    </div>
+  </div>
+<% end %>

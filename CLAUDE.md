@@ -26,6 +26,11 @@ Die einzige Brücke ist der Export (`SONGS_ROOT`).
    `NOTES.md`. Nur Dateien mit Export-Markierung in Zeile 1 werden
    überschrieben, handgeschriebene nie.
 
+Oben sitzt die **Kontrollleiste** (`ControlPanel`, `controls/_panel`): Lämpchen
+wie an einem Amp für Sonic Pi (aus / blinkt beim Hochfahren / an, mit
+Start-Knopf), Song (letzte Takt-Meldung jünger als 3 s) und KI (Job läuft).
+Ein Turbo-Frame, der sich per `poll`-Controller alle 2 s neu holt.
+
 `examples/starlight/` ist die handgeschriebene Vorlage, nach der `Groove`
 gebaut wurde (4-Takt-Sektionen, `get[:section]`, `:clock` zuletzt definieren).
 Kam am 2026-10-20 aus mcblinded herüber, weil es ein Muse-Cover ist.
@@ -55,6 +60,11 @@ steckt in `lib/sonic_pi.rb` + `lib/osc.rb` (kopiert aus `mcblinded/bin/play`).
   stehen in Sonic Pi 5 in den Prozessargumenten des Spider-Servers (`ARGV[1]`,
   `ARGV[6]`) und ändern sich bei jedem Neustart. Senden an `127.0.0.1`, nicht
   `localhost` (löst auf macOS zuerst nach `::1` auf, Pakete verschwinden lautlos).
+- **Sonic Pi aus der App starten nur ohne unsere Ruby-Umgebung.** `open -a`
+  reicht das Environment weiter, und Sonic Pis eigenes Ruby stirbt beim Boot
+  an `RUBYOPT=-rbundler/setup`/`GEM_HOME`/`BUNDLE_GEMFILE` — die GUI meldet dann
+  „Error reading ports via Boot Daemon", `daemon.log` bleibt leer.
+  `SonicPiApp.launch` räumt `RUBY*`/`BUNDLE*`/`GEM_*` vorher ab.
 - **Code > 8 KB über `run_file`**, nicht per UDP (macOS-Limit 9216 B).
 - **Eingebaute Funktionsnamen dürfen keine Variablennamen sein** (`ring`,
   `spread`, `line`, `range`, `knit`, `scale`, `chord`, `tick` …) — sonst

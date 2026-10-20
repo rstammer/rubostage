@@ -16,6 +16,9 @@
   </head>
 
   <body class="min-h-screen" data-controller="theme">
+    <nav class="control-bar" aria-label="Kontrollleiste">
+      <%= render "controls/panel", panel: ControlPanel.new %>
+    </nav>
     <header class="border-b-4 border-accent">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-8">
         <%= link_to root_path, class: "flex items-baseline gap-3" do %>

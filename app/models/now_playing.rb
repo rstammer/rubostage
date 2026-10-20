@@ -9,7 +9,7 @@ class NowPlaying
   # The song Sonic Pi last reported a step for. Lives in the server process,
   # where the listener runs and jobs run inline.
   class << self
-    attr_accessor :current_song_id
+    attr_accessor :current_song_id, :last_step_at
   end
 
   def self.broadcast(song, index)
