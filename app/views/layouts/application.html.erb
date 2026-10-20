@@ -18,7 +18,10 @@
   <body class="min-h-screen" data-controller="theme">
     <nav class="control-bar" aria-label="Kontrollleiste">
       <div class="mx-auto flex max-w-6xl items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-8">
-        <%= link_to "rubostage", root_path, class: "nameplate shrink-0" %>
+        <%= link_to root_path, class: "flex shrink-0 items-center gap-3" do %>
+          <%= image_tag "logo.svg", alt: "", class: "h-11 w-auto drop-shadow" %>
+          <span class="nameplate">rubostage</span>
+        <% end %>
         <div class="min-w-0 flex-1">
           <%= render "controls/panel", panel: ControlPanel.new %>
         </div>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-28.2 67.5 182.7 110.0" role="img" aria-label="rubostage">
+  <defs>
+    <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#bcbfc3"/><stop offset="1" stop-color="#6d7175"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <g transform="rotate(72 60 110)">
+  <!-- Body: a cut ruby, point up. The neck runs into the point, the pavilion
+       widens to the girdle, the crown closes on the flat table below. -->
+  <g stroke="#3a0508" stroke-width="1.6" stroke-linejoin="round">
+    <path d="M14 174H46L60 110Z" fill="#f6604f"/>
+    <path d="M46 174H74L60 110Z" fill="#d42a2a"/>
+    <path d="M74 174H106L60 110Z" fill="#a3121a"/>
+    <path d="M14 174L40 192L46 174Z" fill="#e2392f"/>
+    <path d="M40 192H80L74 174H46Z" fill="#c41d23"/>
+    <path d="M80 192L106 174H74Z" fill="#7c0b11"/>
+  </g>
+  <path d="M60 110L106 174L80 192H40L14 174Z" fill="none" stroke="#3a0508" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Neck and headstock: six in line -->
+  <!-- Pointed headstock: tuners in line on the straight edge, the other edge sweeps out to the tip -->
+  <path d="M54 55L51.4 12Q53.5 23 60 34Q65 42.5 70 46.5L66 55Z" fill="#1b1512" stroke="#0d0907" stroke-width="1.2" stroke-linejoin="round"/>
+  <g fill="url(#chrome)" stroke="#0d0907" stroke-width=".6"><rect x="49.10" y="48.5" width="4.6" height="3" rx="1.3"/><rect x="48.81" y="43.7" width="4.6" height="3" rx="1.3"/><rect x="48.52" y="38.9" width="4.6" height="3" rx="1.3"/><rect x="48.23" y="34.1" width="4.6" height="3" rx="1.3"/><rect x="47.94" y="29.3" width="4.6" height="3" rx="1.3"/><rect x="47.65" y="24.5" width="4.6" height="3" rx="1.3"/></g>
+  <g stroke="#fbf6ec" stroke-width=".4"><line x1="55.8" y1="54" x2="56.10" y2="50"/><line x1="57.5" y1="54" x2="55.81" y2="45.2"/><line x1="59.2" y1="54" x2="55.52" y2="40.4"/><line x1="60.8" y1="54" x2="55.23" y2="35.6"/><line x1="62.5" y1="54" x2="54.94" y2="30.8"/><line x1="64.2" y1="54" x2="54.65" y2="26"/></g>
+  <g fill="#d9dbde" stroke="#0d0907" stroke-width=".3"><circle cx="56.10" cy="50" r="1.05"/><circle cx="55.81" cy="45.2" r="1.05"/><circle cx="55.52" cy="40.4" r="1.05"/><circle cx="55.23" cy="35.6" r="1.05"/><circle cx="54.94" cy="30.8" r="1.05"/><circle cx="54.65" cy="26" r="1.05"/></g>
+  <rect x="54" y="53" width="12" height="80" rx="1" fill="#3a2117" stroke="#1a0c08" stroke-width="1"/>
+  <rect x="54" y="52.5" width="12" height="2" fill="#efe6cf"/>
+  <g fill="#e2bd62"><rect x="54" y="62.0" width="12" height="1"/><rect x="54" y="70.0" width="12" height="1"/><rect x="54" y="77.5" width="12" height="1"/><rect x="54" y="84.5" width="12" height="1"/><rect x="54" y="91.0" width="12" height="1"/><rect x="54" y="97.0" width="12" height="1"/><rect x="54" y="102.5" width="12" height="1"/><rect x="54" y="107.5" width="12" height="1"/><rect x="54" y="112.0" width="12" height="1"/><rect x="54" y="116.0" width="12" height="1"/><rect x="54" y="119.5" width="12" height="1"/><rect x="54" y="122.5" width="12" height="1"/><rect x="54" y="125.3" width="12" height="1"/><rect x="54" y="127.9" width="12" height="1"/></g>
+
+  <!-- Electric: two humbuckers, bridge, two knobs -->
+  <rect x="49" y="139" width="22" height="8" rx="1.5" fill="#151515" stroke="url(#chrome)" stroke-width="1.2"/>
+  <rect x="49" y="153" width="22" height="8" rx="1.5" fill="#151515" stroke="url(#chrome)" stroke-width="1.2"/>
+  <rect x="50" y="167" width="20" height="4.5" rx="1.2" fill="url(#chrome)" stroke="#2a1410" stroke-width=".6"/>
+  <g fill="url(#chrome)" stroke="#1a0c08" stroke-width=".6">
+    <circle cx="85" cy="168" r="3"/><circle cx="87" cy="180" r="3"/>
+  </g>
+
+  <!-- Strings -->
+  <g stroke="#fbf6ec" stroke-width=".45">
+    <line x1="55.8" y1="54" x2="55.8" y2="169"/><line x1="57.5" y1="54" x2="57.5" y2="169"/>
+    <line x1="59.2" y1="54" x2="59.2" y2="169"/><line x1="60.8" y1="54" x2="60.8" y2="169"/>
+    <line x1="62.5" y1="54" x2="62.5" y2="169"/><line x1="64.2" y1="54" x2="64.2" y2="169"/>
+  </g>
+
+  <!-- Glint: a four-point star with a soft glow and a small companion -->
+  <g transform="rotate(-72 40 168) translate(14 47)">
+    <circle cx="26" cy="121" r="7" fill="url(#glow)"/>
+    <path d="M26 109.5L27.6 119.4L37.5 121L27.6 122.6L26 132.5L24.4 122.6L14.5 121L24.4 119.4Z" fill="#fff"/>
+    <path d="M26 116.2L27 120L30.8 121L27 122L26 125.8L25 122L21.2 121L25 120Z" fill="#fff" transform="rotate(45 26 121)"/>
+    <path d="M37 112.5L37.7 115.3L40.5 116L37.7 116.7L37 119.5L36.3 116.7L33.5 116L36.3 115.3Z" fill="#fff"/>
+  </g>
+  </g>
+</svg>
