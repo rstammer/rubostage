@@ -11,3 +11,4 @@
 /config/master.key
 /config/credentials/*.key
 /exports
+/examples/*/out/

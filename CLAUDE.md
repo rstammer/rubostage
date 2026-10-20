@@ -26,6 +26,10 @@ Die einzige Brücke ist der Export (`SONGS_ROOT`).
    `NOTES.md`. Nur Dateien mit Export-Markierung in Zeile 1 werden
    überschrieben, handgeschriebene nie.
 
+`examples/starlight/` ist die handgeschriebene Vorlage, nach der `Groove`
+gebaut wurde (4-Takt-Sektionen, `get[:section]`, `:clock` zuletzt definieren).
+Kam am 2026-10-20 aus mcblinded herüber, weil es ein Muse-Cover ist.
+
 **Die KI-Anbindung über `claude -p` ist vorläufig** (`ClaudeCli`) — austauschbar
 halten. **Offline-fähig bleiben:** alles schon Erzeugte spielt ohne Netz.
 
