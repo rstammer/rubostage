@@ -253,3 +253,7 @@ rubostage grew out of [mcblinded](https://github.com/rstammer/mcblinded), the
 new incarnation of the band Blackminded, where it started as `stage/`. It now
 stands on its own and works for any band, or for one person with a guitar on a
 street corner.
+
+## License
+
+[MIT](LICENSE) © 2026 Robin Stammer
