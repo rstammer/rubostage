@@ -38,6 +38,23 @@ Kam am 2026-10-20 aus mcblinded herüber, weil es ein Muse-Cover ist.
 **Die KI-Anbindung über `claude -p` ist vorläufig** (`ClaudeCli`) — austauschbar
 halten. **Offline-fähig bleiben:** alles schon Erzeugte spielt ohne Netz.
 
+## Design
+
+**Die Seite ist ein alter Röhren-Amp** (Robin: „soll an Oldschool-Amp erinnern",
+nicht nach Literatur aussehen). Hell = **Blonde** (Creme-Tolex, ochsenblutrote
+Bespannung, gebürstete Goldplatte), dunkel = **Blackface** (schwarzes Tolex,
+silberne Bespannung, schwarze Platte); der Hell/Dunkel-Schalter ist ein
+Kippschalter „Blonde / Black". Kontrollleiste = Frontplatte mit Typenschild
+und roten Pilotlampen; „Jetzt"-Anzeige und Wunschfeld = Bespannung mit Keder
+(`.grille`); Transport = Fußschalter (`.footswitch`, SVG-Symbole aus
+`footswitch_cap`); sonst Chrom-Taster (`ring-button`, rot: `button-go`).
+
+- **Schrift: DIN Condensed** (Titel, Akkorde) + **DIN Alternate** (Text) —
+  Systemschriften, weil offline. Robin hat Futura, Gill Sans und Rockwell
+  ausprobiert und A gewählt. Keine Webfonts.
+- **Tonarten und Akkorde nie in Versalien** (`silk`, `uppercase`): aus „Gm"
+  wird sonst „GM", Moll wird Dur.
+
 ## Starten
 
 ```bash

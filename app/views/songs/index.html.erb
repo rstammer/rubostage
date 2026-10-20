@@ -1,44 +1,55 @@
 <% content_for :title, "rubostage" %>
 
-<section class="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
+<section class="grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
   <div>
-    <p class="eyebrow">Wunschsong</p>
-    <h1 class="mt-4 text-5xl leading-[1.05] font-semibold tracking-tight sm:text-7xl">Was sollen wir spielen?</h1>
-    <p class="mt-6 max-w-xl text-xl leading-relaxed text-muted sm:text-2xl">
-      Einen Song nennen, kurz warten, dann läuft das Play-Along – Gesang und Gitarre kommen live dazu.
+    <h1 class="text-6xl leading-[0.95] sm:text-8xl">Was sollen wir spielen?</h1>
+    <p class="mt-6 max-w-md text-xl leading-relaxed text-muted">
+      Einen Song nennen, kurz warten, dann spielt die Band. Gesang und Gitarre kommen von dir.
     </p>
   </div>
 
   <div>
-    <%= form_with model: @song, class: "rounded-3xl border-2 border-ink bg-card p-5 sm:p-8" do |f| %>
-      <%= f.label :request, "Song und Band", class: "eyebrow" %>
+    <%= form_with model: @song, class: "grille p-6 sm:p-9" do |f| %>
+      <%= f.label :request, "Song und Band", class: "text-lg opacity-80" %>
       <%= f.text_field :request, autofocus: true, autocomplete: "off",
             placeholder: "Starlight von Muse",
-            class: "mt-3 w-full border-0 border-b-2 border-ink bg-transparent px-0 pb-3 text-3xl placeholder:text-muted/60 focus:border-accent focus:ring-0 focus:outline-none sm:text-4xl" %>
+            class: "mt-2 w-full border-0 border-b-2 border-grille-ink/50 bg-transparent px-0 pb-3 font-display text-4xl text-grille-ink placeholder:text-grille-ink/40 focus:border-grille-ink focus:ring-0 focus:outline-none sm:text-5xl" %>
       <% if @song.errors[:request].any? %>
-        <p class="mt-3 border-l-4 border-accent pl-3">Erst einen Song nennen.</p>
+        <p class="mt-4 flex items-center gap-3"><span class="lamp lamp-on" aria-hidden="true"></span>Erst einen Song nennen.</p>
       <% end %>
-      <div class="mt-6 flex justify-end">
-        <%= f.button "Los geht’s →", class: "ring-button bg-ink text-paper hover:!bg-accent hover:!border-accent hover:!text-accent-ink" %>
+      <div class="mt-8 flex justify-end">
+        <button type="submit" class="footswitch footswitch-go text-grille-ink">
+          <%= footswitch_cap(:play) %>Los
+        </button>
       </div>
     <% end %>
 
     <% if @songs.any? %>
-      <h2 class="eyebrow mt-14">Schon gespielt – geht auch offline</h2>
-      <ul class="mt-4 divide-y divide-ink/15 border-y-2 border-ink">
-        <% @songs.each do |song| %>
-          <li>
-            <%= link_to song, class: "flex items-baseline justify-between gap-4 py-4 hover:underline hover:decoration-accent hover:decoration-2 hover:underline-offset-4" do %>
-              <span class="text-2xl"><%= song.display_title %>
-                <% if song.artist.present? %><span class="text-muted"> · <%= song.artist %></span><% end %>
-              </span>
-              <span class="eyebrow shrink-0">
-                <%= {"pending" => "wird geschrieben", "ready" => "#{song.key} · #{song.bpm} bpm", "failed" => "fehlgeschlagen"}[song.status] %>
-              </span>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
+      <div class="sheet mt-14 px-6 py-5">
+        <h2 class="text-2xl">Schon gespielt</h2>
+        <p class="text-muted">Spielt auch ohne Netz.</p>
+        <ul class="mt-3 divide-y divide-ink/15">
+          <% @songs.each do |song| %>
+            <li>
+              <%= link_to song, class: "group flex items-baseline justify-between gap-4 py-3" do %>
+                <span class="min-w-0">
+                  <span class="font-display text-2xl group-hover:text-accent"><%= song.display_title %></span>
+                  <% if song.artist.present? %><span class="text-muted"> <%= song.artist %></span><% end %>
+                </span>
+                <span class="shrink-0 text-muted">
+                  <% if song.ready? %>
+                    <%# Keys keep their case: Gm is not GM. %>
+                    <span class="font-display text-xl text-ink"><%= song.key %></span>
+                    <span class="ml-2 font-display text-xl text-ink"><%= song.bpm %></span> <span class="silk">bpm</span>
+                  <% else %>
+                    <span class="silk"><%= song.pending? ? "wird geschrieben" : "fehlgeschlagen" %></span>
+                  <% end %>
+                </span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
     <% end %>
   </div>
 </section>

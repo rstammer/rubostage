@@ -17,28 +17,26 @@
 
   <body class="min-h-screen" data-controller="theme">
     <nav class="control-bar" aria-label="Kontrollleiste">
-      <%= render "controls/panel", panel: ControlPanel.new %>
-    </nav>
-    <header class="border-b-4 border-accent">
-      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-8">
-        <%= link_to root_path, class: "flex items-baseline gap-3" do %>
-          <span class="text-2xl font-semibold tracking-tight sm:text-3xl">rubostage</span>
-        <% end %>
-        <button type="button" class="ring-button size-12 !p-0" data-action="theme#toggle" aria-label="Hell/Dunkel umschalten">
-          <svg viewBox="0 0 24 24" class="size-6" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
-            <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>
-          </svg>
+      <div class="mx-auto flex max-w-6xl items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-8">
+        <%= link_to "rubostage", root_path, class: "nameplate shrink-0" %>
+        <div class="min-w-0 flex-1">
+          <%= render "controls/panel", panel: ControlPanel.new %>
+        </div>
+        <button type="button" class="flex shrink-0 items-center gap-2" data-action="theme#toggle"
+                aria-label="Amp wechseln: Blonde (hell) oder Blackface (dunkel)">
+          <span class="panel-label hidden sm:inline">Blonde</span>
+          <span class="toggle" aria-hidden="true"></span>
+          <span class="panel-label hidden sm:inline">Black</span>
         </button>
       </div>
-    </header>
+    </nav>
 
     <main class="mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16">
       <% if flash[:notice] %>
-        <p class="mb-8 rounded-2xl border-2 border-ink/30 px-5 py-4 text-lg"><%= flash[:notice] %></p>
+        <p class="sheet mb-8 px-5 py-4 text-lg"><%= flash[:notice] %></p>
       <% end %>
       <% if flash[:alert] %>
-        <p class="mb-8 rounded-2xl border-2 border-accent bg-accent/15 px-5 py-4 text-lg"><%= flash[:alert] %></p>
+        <p class="sheet mb-8 flex items-center gap-3 px-5 py-4 text-lg"><span class="lamp lamp-on" aria-hidden="true"></span><%= flash[:alert] %></p>
       <% end %>
       <%= yield %>
     </main>

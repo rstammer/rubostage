@@ -1,5 +1,5 @@
 <%= turbo_frame_tag "controls" do %>
-  <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-2 px-4 py-2.5 sm:px-8"
+  <div class="flex flex-wrap items-center gap-x-8 gap-y-2"
        data-controller="poll" data-poll-url-value="<%= controls_path %>">
     <div class="flex items-center gap-3">
       <span class="lamp <%= {ready: "lamp-on", starting: "lamp-blink"}[panel.sonic_pi] %>" aria-hidden="true"></span>
@@ -16,7 +16,7 @@
       <span class="lamp <%= "lamp-on" if song %>" aria-hidden="true"></span>
       <span class="panel-label">Song</span>
       <% if song %>
-        <%= link_to song.display_title, song_path(song), class: "truncate text-sm text-panel-ink hover:underline", data: {turbo_frame: "_top"} %>
+        <%= link_to song.display_title, song_path(song), class: "truncate text-sm font-bold text-plate-ink hover:underline", data: {turbo_frame: "_top"} %>
       <% end %>
     </div>
 

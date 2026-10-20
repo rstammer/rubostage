@@ -1,19 +1,19 @@
-<div id="now_playing" class="rounded-3xl border-2 border-ink bg-card p-6 sm:p-10">
+<div id="now_playing" class="grille min-h-64 p-7 sm:p-12">
   <% if now.finished? %>
-    <p class="eyebrow">Ende</p>
-    <p class="mt-2 text-8xl leading-none font-semibold tracking-tight sm:text-[10rem]">Schluss</p>
+    <p class="text-xl opacity-80">Ende</p>
+    <p class="mt-1 font-display text-8xl leading-none sm:text-[11rem]">Schluss</p>
   <% elsif now.playing? %>
-    <p class="eyebrow"><%= now.section %></p>
-    <div class="mt-2 flex flex-wrap items-baseline gap-x-10 gap-y-2">
-      <span class="text-8xl leading-none font-semibold tracking-tight sm:text-[10rem]"><%= now.chord %></span>
-      <span class="text-3xl text-muted sm:text-5xl">dann <span class="text-ink"><%= now.next_chord %></span></span>
+    <p class="text-xl opacity-80"><%= now.section %></p>
+    <div class="mt-1 flex flex-wrap items-baseline gap-x-12 gap-y-2">
+      <span class="font-display text-[7rem] leading-none sm:text-[12rem]"><%= now.chord %></span>
+      <span class="text-3xl opacity-80 sm:text-5xl">dann <span class="font-display opacity-100"><%= now.next_chord %></span></span>
     </div>
     <style>
-      #<%= now.sheet_id %> { background: var(--accent); color: var(--accent-ink); border-radius: 0.5rem; padding: 0 0.35rem; }
-      #form-<%= now.form_position %> { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+      #<%= now.sheet_id %> { background: var(--accent); color: var(--accent-ink); border-radius: 0.35rem; padding: 0 0.35rem; }
+      #form-<%= now.form_position %> .lamp { background: var(--lamp-lit-bg); box-shadow: var(--lamp-lit-shadow); }
     </style>
   <% else %>
-    <p class="eyebrow">Jetzt</p>
-    <p class="mt-3 text-3xl text-muted sm:text-4xl">Sobald es läuft, steht hier der Akkord.</p>
+    <p class="text-xl opacity-80">Jetzt</p>
+    <p class="mt-3 max-w-xl font-display text-4xl leading-tight sm:text-5xl">Sobald es läuft, steht hier der Akkord.</p>
   <% end %>
 </div>

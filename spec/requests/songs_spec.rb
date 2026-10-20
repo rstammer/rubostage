@@ -10,6 +10,14 @@ RSpec.describe "Songs", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Starlight", 'name="song[request]"')
     end
+
+    it "keeps the case of a key, so minor stays minor" do
+      song = create(:song, :ready)
+      song.update!(key: "Gm")
+      get root_path
+      expect(response.body).to match(%r{<span class="font-display[^"]*">Gm</span>})
+      expect(response.body).not_to match(/class="silk[^"]*">[^<]*Gm/)
+    end
   end
 
   describe "POST /songs" do
@@ -36,7 +44,7 @@ RSpec.describe "Songs", type: :request do
     it "says when the full arrangement is on its way" do
       song = create(:song, :ready, arrangement_status: "pending")
       get song_path(song)
-      expect(response.body).to include("volles Arrangement kommt")
+      expect(response.body).to include("Arrangement kommt", "lamp-blink")
     end
 
     it "says it is still working on a pending song" do
