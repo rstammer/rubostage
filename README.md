@@ -94,16 +94,44 @@ flowchart LR
 5. Commands are written into Sonic Pi's time state. The conductor reads them at
    the next section boundary.
 
-The AI is reached through the local `claude` CLI (`claude -p`), so no API key is
-needed. `ClaudeCli` is deliberately small: anything that answers
-`#call(prompt)` with text can take its place.
+### Bring your own LLM
+
+Out of the box the AI is reached through the local `claude` CLI (`claude -p`),
+so no API key is needed. That is a convenience, not a dependency: the writers
+only need an object that answers `#call(prompt)` with text. `ClaudeCli` is
+nothing more than that, and any LLM call can take its place, for example through
+[RubyLLM](https://rubyllm.com):
+
+```ruby
+# app/models/ruby_llm_client.rb
+class RubyLLMClient
+  def initialize(model: "claude-sonnet-5-5")
+    @model = model
+  end
+
+  def call(prompt)
+    RubyLLM.chat(model: @model).ask(prompt).content
+  end
+end
+```
+
+Both writers take the client as an argument:
+
+```ruby
+SheetWriter.new(client: RubyLLMClient.new)
+ArrangementWriter.new(client: RubyLLMClient.new)
+```
+
+Swap the default in those two places and rubostage talks to whichever provider
+RubyLLM is configured for: Anthropic, OpenAI, Gemini, or a local model via
+Ollama.
 
 ## Requirements
 
 - macOS (Sonic Pi is started with `open -a`, fonts are macOS system fonts)
 - Ruby 3.4.7 and SQLite
 - [Sonic Pi 5](https://sonic-pi.net): `brew install --cask sonic-pi`
-- [Claude Code](https://claude.com/claude-code), logged in, for `claude -p`
+- [Claude Code](https://claude.com/claude-code), logged in, for `claude -p`, or any other LLM (see [Bring your own LLM](#bring-your-own-llm))
 
 ## Getting started
 
@@ -198,13 +226,6 @@ learned along the way:
 - **Built-in function names cannot be variable names.** `ring`, `line`,
   `range` and friends make Sonic Pi reject the whole buffer. `CodeCheck` catches
   that before sending.
-
-## Design
-
-The page is an old valve amp: tolex, grille cloth framed by piping, a brushed
-control plate with a nameplate and pilot lamps, chrome footswitches for the
-transport. Type is DIN, set from macOS system fonts, because the stage runs
-offline on the street and loads nothing from the web.
 
 ## Development
 
