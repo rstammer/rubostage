@@ -37,9 +37,9 @@ It shows **form and chords only**. Lyrics and melody are yours.
 - **A lead sheet that follows.** Sonic Pi reports every chord change. The page
   shows the current chord big, the next one small, and marks the part of the
   form you are in.
-- **Steer it with your feet.** Well, with keys: repeat the part, skip to the
-  next, jump anywhere in the form, or play the ending. Every command lands
-  cleanly at a section boundary.
+- **Steer it while you play.** Repeat the part, skip to the next, jump
+  anywhere in the form, or play the ending. Every command lands cleanly at a
+  section boundary. For now that means keys; a MIDI foot controller is planned.
 - **Fix what the AI got wrong.** Edit title, key, tempo, form, chords, and per
   section the groove, energy, swing and guitar style. Add riffs as plain ASCII
   guitar tabs. Saving while the song plays updates it in place.
@@ -161,6 +161,14 @@ for long.
 | <kbd>N</kbd> / <kbd>→</kbd> | next part |
 | <kbd>E</kbd> | play the ending |
 | <kbd>1</kbd>–<kbd>9</kbd> | jump to that part of the form |
+
+### MIDI foot controller (planned)
+
+The footswitches on the page are meant to become real ones: a MIDI foot
+controller sending the same commands, so both hands stay on the guitar. This is
+planned but **not built or tried yet**. A pedal that sends plain keystrokes
+should already work with the keys above, since the page only listens for
+keys, but that has not been tried either.
 
 ## Riffs as tabs
 
