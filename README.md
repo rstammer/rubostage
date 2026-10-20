@@ -37,6 +37,20 @@ SONGS_ROOT=../mcblinded/songs PORT=4567 bin/dev
 Without it, songs land in `exports/` (gitignored). Files without the export
 mark in their first line count as hand-written and are never overwritten.
 
+## Playing without the app
+
+`bin/play` sends a file straight to Sonic Pi, using the same client as the app:
+
+```bash
+bin/play examples/starlight/live.rb
+bin/play -e 'set :section, :verse'
+bin/play --stop
+bin/play --record examples/starlight/live.rb -o take.wav -t 30
+```
+
+`examples/starlight/` is the hand-written play-along the generated grooves
+are modelled on.
+
 ## Tests
 
 ```bash

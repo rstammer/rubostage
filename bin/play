@@ -1,0 +1,75 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Sends Sonic Pi code to the running Sonic Pi server, without the app.
+#
+#   bin/play examples/starlight/live.rb
+#   bin/play -e 'play 72'
+#   bin/play --stop
+#   bin/play --record examples/starlight/live.rb -o take.wav
+#
+# Sonic Pi has to be running — the app brings the server with it — but its
+# editor is not used. The client is the one the app uses, see lib/sonic_pi.rb.
+
+require_relative "../lib/osc"
+require_relative "../lib/sonic_pi"
+
+def server
+  SonicPi.running || abort(<<~MSG)
+    Sonic Pi läuft nicht.
+
+      open -a "Sonic Pi"
+
+    Nach dem Start einen Moment warten, bis der Server oben ist.
+  MSG
+end
+
+def read_code(file)
+  abort "Datei nicht gefunden: #{file}" unless File.exist?(file)
+  File.read(file)
+end
+
+case ARGV.first
+when nil, "-h", "--help"
+  puts <<~USAGE
+    bin/play <datei>                  Sonic-Pi-Datei abspielen
+    bin/play -e <code>                Code direkt abspielen
+    bin/play --stop                   alle laufenden Jobs stoppen
+    bin/play --status                 Server-Status zeigen
+    bin/play --record <datei> -o <wav>  aufnehmen (Dauer mit -t, Standard 30 s)
+  USAGE
+
+when "--status"
+  sp = SonicPi.running
+  if sp
+    puts "Sonic Pi läuft — Port #{sp.port}, Token #{sp.token}"
+  else
+    puts "Sonic Pi läuft nicht."
+    exit 1
+  end
+
+when "--stop"
+  server.stop
+  puts "gestoppt"
+
+when "-e"
+  code = ARGV[1] or abort "Kein Code angegeben."
+  server.run(code)
+  puts "läuft"
+
+when "--record"
+  file = ARGV[1] or abort "Keine Datei angegeben."
+  output = ARGV[ARGV.index("-o") + 1] if ARGV.include?("-o")
+  output ||= "take.wav"
+  seconds = ARGV.include?("-t") ? ARGV[ARGV.index("-t") + 1].to_f : 30.0
+  code = read_code(file)
+
+  puts "nehme #{seconds} s auf → #{output}"
+  server.record(code, output) { sleep seconds }
+  puts File.exist?(output) ? "fertig: #{File.size(output)} bytes" : "keine Datei entstanden"
+
+else
+  code = read_code(ARGV.first)
+  server.run(code)
+  puts "läuft — stoppen mit: bin/play --stop"
+end

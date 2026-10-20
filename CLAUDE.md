@@ -48,6 +48,8 @@ tail -f /dev/null | SONGS_ROOT=../mcblinded/songs PORT=4567 bin/dev
 
 Sonic Pi 5.0 (`brew install --cask sonic-pi`), die App muss laufen. Der Client
 steckt in `lib/sonic_pi.rb` + `lib/osc.rb` (kopiert aus `mcblinded/bin/play`).
+`bin/play` nutzt ihn ohne Rails: `bin/play <datei>`, `-e <code>`, `--stop`,
+`--status`, `--record <datei> -o <wav> -t <s>`.
 
 - **Nicht auf das Gem `spx` umstellen** — gegen 4.5 geschrieben. Port und Token
   stehen in Sonic Pi 5 in den Prozessargumenten des Spider-Servers (`ARGV[1]`,

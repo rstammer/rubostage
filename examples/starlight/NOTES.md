@@ -48,10 +48,8 @@ Drei Teile, alle exakt vier Takte, umschaltbar wie bei traveller:
 
 `:intro` deckt auch den B-Teil ab — gleiche Harmonik, gleiche Besetzung.
 
-Mit `bin/play` aus mcblinded, von dort aus:
-
 ```bash
-bin/play ../rubostage/examples/starlight/live.rb
+bin/play examples/starlight/live.rb
 bin/play -e 'set :section, :verse'
 bin/play -e 'set :section, :bridge'
 bin/play --stop
