@@ -168,4 +168,33 @@ RSpec.describe "Songs", type: :request do
       expect(Song.count).to eq(0)
     end
   end
+
+  describe "arranging" do
+    let(:song) { create(:song, :ready) }
+
+    it "offers to arrange a song that has none" do
+      get song_path(song)
+      expect(response.body).to include("Arrangieren lassen", 'name="wish"')
+    end
+
+    it "asks before replacing an arrangement" do
+      song.update!(arrangement: {"sections" => {}}, arrangement_status: "ready")
+      get song_path(song)
+      expect(response.body).to include("Neu arrangieren", "data-turbo-confirm")
+    end
+
+    it "offers nothing while an arrangement is on its way" do
+      song.update!(arrangement_status: "pending")
+      get song_path(song)
+      expect(response.body).not_to include("Arrangieren lassen", "Neu arrangieren")
+    end
+
+    it "sends the song and the wish to Claude" do
+      expect {
+        post song_arrangement_path(song), params: {wish: "mehr Funk"}
+      }.to have_enqueued_job(ArrangeSongJob).with(song, wish: "mehr Funk")
+      expect(song.reload.arrangement_status).to eq("pending")
+      expect(response).to redirect_to(song_path(song))
+    end
+  end
 end

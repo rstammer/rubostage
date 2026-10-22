@@ -44,4 +44,18 @@ RSpec.describe ArrangeSongJob do
     expect { described_class.perform_now(song) }.not_to raise_error
     expect(song.reload.arrangement_status).to eq("ready")
   end
+
+  it "hands Robin's wish to the writer" do
+    described_class.perform_now(song, wish: "mehr Funk")
+    expect(writer).to have_received(:call).with(anything, wish: "mehr Funk")
+  end
+
+  it "keeps the old arrangement when a new one fails" do
+    song.update!(arrangement: arrangement.to_h, arrangement_status: "ready")
+    allow(writer).to receive(:call).and_raise(ClaudeCli::Failed, "timeout")
+    described_class.perform_now(song)
+    song.reload
+    expect(song.arrangement_status).to eq("ready")
+    expect(song.arrangement["sounds"]["bass"]).to eq("tb303")
+  end
 end

@@ -105,6 +105,26 @@
     <% end %>
   </section>
 
+  <% unless @song.arrangement_status == "pending" %>
+    <% again = @song.arrangement.present? %>
+    <section class="sheet mt-14 p-5 sm:p-7">
+      <h2 class="text-3xl"><%= again ? "Neu arrangieren" : "Arrangieren lassen" %></h2>
+      <p class="text-muted">
+        <%= again ? "Die KI schreibt die Band neu. Was du an Energie, Groove und Gitarre eingestellt hast, ist danach weg." :
+              "Die KI schreibt aus Tonart, Tempo und Akkorden die Band: Schlagzeug, Bass, Gitarre und Flächen." %>
+      </p>
+      <%= form_with url: song_arrangement_path(@song), class: "mt-4 flex flex-wrap items-end gap-4",
+            data: ({turbo_confirm: "Das jetzige Arrangement wird ersetzt. Weiter?"} if again) do %>
+        <div class="min-w-64 flex-1">
+          <%= label_tag "wish", "Wunsch (optional)", class: "eyebrow block" %>
+          <%= text_field_tag "wish", nil, autocomplete: "off", class: "field mt-2 w-full px-3 py-2 text-lg",
+                placeholder: "z. B. ruhiger, Reggae im Refrain, ohne Fläche" %>
+        </div>
+        <button type="submit" class="ring-button button-go"><%= again ? "Neu arrangieren" : "Arrangieren lassen" %></button>
+      <% end %>
+    </section>
+  <% end %>
+
   <div class="mt-14 flex flex-wrap items-center justify-between gap-6 border-t-2 border-ink/20 pt-6">
     <p class="max-w-2xl text-muted">
       Tasten: P spielen, S stopp, R nochmal, N oder → weiter, E Schluss, 1–9 springen.

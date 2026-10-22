@@ -3,7 +3,7 @@
 class ArrangementWriter
   PROMPT = <<~TEXT
     You arrange backing tracks for a busker who plays guitar and sings along.
-    The song: %<title>s by %<artist>s, %<bpm>s BPM, key %<key>s.
+    The song: %<song>s, %<bpm>s BPM, key %<key>s.
 
     Sections and their chords, one bar of 4/4 per entry:
     %<sections>s
@@ -48,23 +48,31 @@ class ArrangementWriter
     - One entry per section name above. No lyrics, no melodies, no riffs.
   TEXT
 
+  WISH = <<~TEXT
+
+    The busker has a wish for this arrangement. Follow it as far as the
+    rules above allow:
+    %<wish>s
+  TEXT
+
   def initialize(client: ClaudeCli.new)
     @client = client
   end
 
-  def call(sheet)
-    Arrangement.parse(@client.call(prompt_for(sheet)), sheet)
+  def call(sheet, wish: nil)
+    Arrangement.parse(@client.call(prompt_for(sheet, wish.to_s.strip)), sheet)
   end
 
   private
 
-  def prompt_for(sheet)
+  def prompt_for(sheet, wish)
     sections = sheet.sections.map do |section|
       "  #{section.name}: #{section.bars.map { |bar| bar.join(" ") }.join(" | ")}"
     end
-    format(
+    song = sheet.artist.present? ? "#{sheet.title} by #{sheet.artist}" : "#{sheet.title}, the busker's own song"
+    prompt = format(
       PROMPT,
-      title: sheet.title, artist: sheet.artist, bpm: sheet.bpm, key: sheet.key,
+      song: song, bpm: sheet.bpm, key: sheet.key,
       sections: sections.join("\n"),
       grooves: DrumGroove::NAMES.join(", "),
       guitars: Arrangement::Part::GUITARS.join(", "),
@@ -72,5 +80,6 @@ class ArrangementWriter
       comp: Arrangement::SOUNDS[:comp].join(", "),
       pad: Arrangement::SOUNDS[:pad].join(", ")
     )
+    wish.empty? ? prompt : prompt + format(WISH, wish: wish)
   end
 end
