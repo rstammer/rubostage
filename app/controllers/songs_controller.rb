@@ -46,6 +46,7 @@ class SongsController < ApplicationController
   def destroy
     song = Song.find(params[:id])
     stop_if_playing(song)
+    SongExport.new(song).remove if song.ready?
     song.destroy!
     redirect_to root_path, notice: "#{song.display_title} ist gelöscht."
   end

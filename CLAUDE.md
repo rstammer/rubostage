@@ -8,23 +8,35 @@ keine Original-Songtexte.
 Entstanden als `stage/` im Band-Repo `mcblinded`, 2026-10-20 in ein eigenes
 Repo gezogen (Historie mitgenommen). rubostage ist **bandunabhängig**: Was für
 Blackminded/mcblinded spezifisch ist, gehört nach `mcblinded`, nicht hierher.
-Die einzige Brücke ist der Export (`SONGS_ROOT`).
+Die einzige Brücke ist der Song-Ordner (Einstellungen).
 
 ## Ablauf
+
+Der **Song-Editor** ist das Zentrum: Ein Song ist Gerüst (Tonart, Tempo,
+Teile, Akkorde, Ablauf) plus optional Arrangement. Das Gerüst kommt entweder
+von der KI (Wunsch, `origin: "wish"`) oder aus dem leeren Editor
+(`origin: "manual"`, `/songs/new`). Startseite = Repertoire.
 
 1. Wunsch → `claude -p` → `SongSheet` (Tonart, Tempo, Form, Akkorde) → `Groove`
    spielt sofort in Sonic Pi.
 2. `ArrangeSongJob` holt ein JSON-Arrangement (Klänge aus fester Liste,
    16-Step-Patterns, Energie 1–3 je Teil, Drum-Groove, Gitarrenspielweise) und
    tauscht im Laufen nur die Stimmen; der `:conductor`-Loop behält die Position.
+   Beim Wunsch automatisch, sonst per „Arrangieren lassen“ / „Neu arrangieren“
+   mit optionalem Wunschtext. Scheitert ein neues, bleibt das alte.
 3. Sonic Pi meldet jeden Akkord per OSC an UDP 4570 (`STAGE_OSC_PORT`),
    `StepListener` schiebt es per Turbo Stream ins Lead-Sheet.
 4. Befehle (Wiederholen/Weiter/Springen/Ende) greifen an Teilgrenzen,
    Tasten P/S/R/N/E/1–9.
 5. Songs sind editierbar (`SongEditor`), Riffs als ASCII-Tab (`Tab`, `RiffTrack`).
-6. „⤓ Ins Repo" → `SongExport` schreibt `<SONGS_ROOT>/<song>/live.rb` +
-   `NOTES.md`. Nur Dateien mit Export-Markierung in Zeile 1 werden
-   überschrieben, handgeschriebene nie.
+6. **Code eingefroren:** `songs.code` wird gespielt und nur bei Änderungen
+   neu gebaut (`Song#rebuild_code!`: Speichern, Arrangieren, „Code neu bauen“).
+7. Jeder Code-Bau legt den Song in den **Song-Ordner** (`Setting.songs_root`,
+   Einstellungen; Fallback `SONGS_ROOT`, dann `exports/`): `SongExport` schreibt
+   `<ordner>/<song.folder>/live.rb` + `NOTES.md`. Ordnername bleibt ab dem
+   ersten Export stabil. Nur Dateien mit Export-Markierung in Zeile 1 werden
+   überschrieben, handgeschriebene nie. Git fasst die App nicht an. Löschen
+   eines Songs nimmt seine markierten Dateien mit.
 
 Oben sitzt die **Kontrollleiste** (`ControlPanel`, `controls/_panel`): Lämpchen
 wie an einem Amp für Sonic Pi (aus / blinkt beim Hochfahren / an, mit

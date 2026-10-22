@@ -40,13 +40,16 @@ It shows **form and chords only**. Lyrics and melody are yours.
 - **Steer it while you play.** Repeat the part, skip to the next, jump
   anywhere in the form, or play the ending. Every command lands cleanly at a
   section boundary. For now that means keys; a MIDI foot controller is planned.
+- **Write your own.** Start a song from scratch in the editor, just key, tempo,
+  sections and chords, and let the AI arrange the band on demand. Any song can
+  be arranged again, with a wish like "quieter, reggae in the chorus".
 - **Fix what the AI got wrong.** Edit title, key, tempo, form, chords, and per
   section the groove, energy, swing and guitar style. Add riffs as plain ASCII
   guitar tabs. Saving while the song plays updates it in place.
 - **Works offline.** Every song you have made plays again without a network.
   Only new requests need the AI.
-- **Take it home.** "Ins Repo" exports a song as a standalone Sonic Pi file
-  plus notes into a band's repository, so it lives on without the app.
+- **Take it home.** Every song lands in a songs folder of your choice as a
+  standalone Sonic Pi file plus notes, so it lives on without the app.
 
 ## The control bar
 
@@ -188,18 +191,25 @@ One character is a sixteenth, 16 per bar. `x` is a dead note, `-` lets it ring.
 Tunings: standard, drop D, half a step down and D standard. Riffs repeat until
 their section ends.
 
-## Exporting songs
+## The songs folder
 
-**Ins Repo** writes `<songs>/<song>/live.rb` and `NOTES.md`. The `live.rb` plays
-on its own, without the app. Point `SONGS_ROOT` at a band's songs folder:
+Choose a folder under **Einstellungen** in the control bar. Every song lands
+there as `<folder>/<song>/live.rb` and `NOTES.md`, rewritten whenever the song
+is saved, arranged or rebuilt; deleting a song takes its files away again. The
+`live.rb` plays on its own, without the app. rubostage never touches git:
+make the folder a repository and version it yourself.
 
-```bash
-SONGS_ROOT=../mcblinded/songs PORT=4567 bin/dev
-```
+Until a folder is chosen, songs land in `SONGS_ROOT` if set, else in
+`exports/` (gitignored). Each song keeps its folder name from the first time
+it is written, so renaming a song does not scatter its history.
 
-Without it, songs land in `exports/` (gitignored). Exported files carry a mark
-in their first line and are overwritten by the next export. A file without the
-mark counts as hand-written and is never touched.
+Exported files carry a mark in their first line and are overwritten next
+time. Take the mark out and the file counts as hand-written: it is never
+touched again.
+
+A song keeps its Sonic Pi code: it sounds the way it did when last saved or
+arranged, even after the groove engine has changed. **Code neu bauen** on the
+song's page brings it up to date.
 
 ## Playing without the app
 

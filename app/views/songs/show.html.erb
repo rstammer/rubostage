@@ -130,18 +130,29 @@
   <% end %>
 
   <div class="mt-14 flex flex-wrap items-center justify-between gap-6 border-t-2 border-ink/20 pt-6">
-    <p class="max-w-2xl text-muted">
-      Tasten: P spielen, S stopp, R nochmal, N oder → weiter, E Schluss, 1–9 springen.
-      Nur Form und Akkorde – Text und Melodie kommen von dir.
-    </p>
+    <div class="max-w-2xl text-muted">
+      <p>
+        Tasten: P spielen, S stopp, R nochmal, N oder → weiter, E Schluss, 1–9 springen.
+        Nur Form und Akkorde – Text und Melodie kommen von dir.
+      </p>
+      <% export = SongExport.new(@song) %>
+      <p class="mt-2">
+        <% if export.exported? %>
+          Liegt in <code><%= export.dir %></code>.
+        <% elsif @song.folder %>
+          <code><%= export.dir %></code> ist von Hand übernommen und bleibt, wie es ist.
+        <% else %>
+          Noch nicht im Song-Ordner – liegt dort nach dem nächsten Speichern oder „Code neu bauen“.
+        <% end %>
+        <%= link_to "Song-Ordner ändern", settings_path, class: "underline" %>
+      </p>
+    </div>
     <div class="flex gap-3">
       <%= link_to "Bearbeiten", edit_song_path(@song), class: "ring-button" %>
       <%= button_to "Löschen", song_path(@song), method: :delete, class: "ring-button",
             form: {data: {turbo_confirm: "#{@song.display_title} wirklich löschen?"}} %>
       <%= button_to "Code neu bauen", song_code_path(@song), class: "ring-button",
             title: "Baut den Sonic-Pi-Code mit dem aktuellen Groove neu" %>
-      <%= button_to "Ins Repo", song_export_path(@song), class: "ring-button",
-            title: "Schreibt live.rb und NOTES.md in den Songs-Ordner der Band" %>
     </div>
   </div>
   </div>

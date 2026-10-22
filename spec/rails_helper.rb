@@ -36,6 +36,18 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
+
+  # Songs are written to the songs folder whenever their code is built, so
+  # every example gets a folder of its own instead of the app's exports/.
+  config.around do |example|
+    before = Rails.application.config.x.songs_root
+    Dir.mktmpdir do |dir|
+      Rails.application.config.x.songs_root = Pathname(dir).join("songs").tap(&:mkpath)
+      example.run
+    ensure
+      Rails.application.config.x.songs_root = before
+    end
+  end
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join("spec/fixtures")

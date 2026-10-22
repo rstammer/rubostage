@@ -1,10 +1,15 @@
-# Takes a song from the stage into a band's repo, as <songs>/<song>/live.rb and
-# NOTES.md, so it plays with bin/play and lives on without the app.
+# Puts a song into the songs folder as <songs>/<song>/live.rb and NOTES.md, so
+# it plays with bin/play and lives on without the app. The folder is meant to
+# be a repo of its own; rubostage writes files and leaves git alone.
 #
 # Both files carry a mark in their first line. A file with the mark came from
 # here and is overwritten by the next export; a file without it was written by
 # hand and is never touched. Taking the mark out is how a song leaves the
 # stage for good.
+#
+# Each song keeps the name of its folder from its first export, so a new
+# title does not scatter its history, and two songs of the same title do not
+# write over each other.
 class SongExport
   class HandWritten < StandardError; end
 
@@ -13,7 +18,17 @@ class SongExport
   FILES = %w[live.rb NOTES.md].freeze
 
   def self.default_root
-    Rails.application.config.x.songs_root
+    Setting.songs_root
+  end
+
+  # After the folder has moved: every finished song goes there, except where
+  # a song has been taken over by hand.
+  def self.mirror_all(root: default_root)
+    Song.where(status: "ready").find_each do |song|
+      new(song, root: root).call
+    rescue HandWritten
+      next
+    end
   end
 
   def initialize(song, root: self.class.default_root)
@@ -23,15 +38,16 @@ class SongExport
   end
 
   def dir
-    @root.join(@sheet.title.parameterize(separator: "_"))
+    @root.join(@song.folder || free_folder)
   end
 
-  # The folder as the band's repo knows it, e.g. "songs/starlight".
+  # The folder as the songs repo knows it, e.g. "songs/starlight".
   def path
     "#{@root.basename}/#{dir.basename}"
   end
 
   def call
+    claim_folder
     hand_written = FILES.find { |name| hand_written?(dir.join(name)) }
     raise HandWritten, "#{path}/#{hand_written}" if hand_written
 
@@ -41,7 +57,39 @@ class SongExport
     self
   end
 
+  # Takes back what the export wrote, and the folder if nothing else is left.
+  def remove
+    return unless @song.folder && dir.directory?
+
+    FILES.map { |name| dir.join(name) }.select { |file| file.exist? && !hand_written?(file) }.each(&:delete)
+    dir.rmdir if dir.empty?
+  end
+
+  # Whether the song lies in the folder as the export wrote it.
+  def exported?
+    @song.folder.present? && FILES.all? { |name| dir.join(name).exist? && !hand_written?(dir.join(name)) }
+  end
+
   private
+
+  def claim_folder
+    @song.update_column(:folder, free_folder) unless @song.folder
+  end
+
+  # The title as a folder name, numbered on when another song has it or a
+  # folder of that name holds a song written by hand.
+  def free_folder
+    base = @sheet.title.parameterize(separator: "_").presence || "song"
+    return base if free?(base)
+
+    (2..).lazy.map { |n| "#{base}_#{n}" }.find { |name| free?(name) }
+  end
+
+  def free?(name)
+    return false if Song.where(folder: name).where.not(id: @song.id).exists?
+
+    FILES.none? { |file| hand_written?(@root.join(name, file)) }
+  end
 
   def hand_written?(file)
     file.exist? && !file.read.start_with?(MARK, MARK_MD)
@@ -73,8 +121,11 @@ class SongExport
   end
 
   def header
+    mark = "#{MARK_MD} The next export overwrites this file; to work on it by hand, take this line out first. -->"
+    return "#{mark}\n# #{@sheet.title}\n\nEigener Song, in rubostage geschrieben.\n" if @song.manual?
+
     <<~MD
-      #{MARK_MD} The next export overwrites this file; to work on it by hand, take this line out first. -->
+      #{mark}
       # #{@sheet.title}
 
       Cover von **#{@sheet.artist} — „#{@sheet.title}"**, aus rubostage übernommen.

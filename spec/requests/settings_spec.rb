@@ -16,8 +16,10 @@ RSpec.describe "Settings", type: :request do
     expect(response.body).to include(Setting.songs_root.to_s, 'name="songs_root"')
   end
 
-  it "stores a new songs folder" do
+  it "stores a new songs folder and puts every song there" do
+    create(:song, :ready)
     patch settings_path, params: {songs_root: @dir.to_s}
+    expect(@dir.join("starlight/live.rb")).to exist
     expect(Setting.songs_root).to eq(@dir)
     expect(response).to redirect_to(settings_path)
   end

@@ -224,7 +224,9 @@ RSpec.describe "Songs", type: :request do
     end
 
     it "removes the song and goes back to the repertoire" do
+      song.rebuild_code!
       delete song_path(song)
+      expect(Setting.songs_root.join("starlight")).not_to exist
       expect(Song.exists?(song.id)).to be(false)
       expect(response).to redirect_to(root_path)
       expect(Player).not_to have_received(:stop)
@@ -257,6 +259,16 @@ RSpec.describe "Songs", type: :request do
       post song_code_path(song)
       expect(song.reload.code).to include("live_loop :conductor")
       expect(response).to redirect_to(song_path(song))
+    end
+  end
+
+  describe "the songs folder" do
+    it "tells where the song lies" do
+      song = create(:song, :ready)
+      song.rebuild_code!
+      get song_path(song)
+      expect(response.body).to include(Setting.songs_root.join("starlight").to_s)
+      expect(response.body).not_to include("Ins Repo")
     end
   end
 end

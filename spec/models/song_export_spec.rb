@@ -9,8 +9,8 @@ RSpec.describe SongExport do
   let(:export) { described_class.new(song, root: @root) }
   let(:dir) { @root.join("starlight") }
 
-  it "writes into the app's exports folder unless SONGS_ROOT says otherwise" do
-    expect(described_class.default_root.to_s).to eq(Rails.root.join("exports").to_s)
+  it "writes into the songs folder from the settings" do
+    expect(described_class.default_root).to eq(Setting.songs_root)
   end
 
   it "names the path after the folder it writes into" do
@@ -69,11 +69,89 @@ RSpec.describe SongExport do
     expect(dir.join("live.rb").read).to include("use_bpm 100")
   end
 
-  it "refuses to overwrite a hand-written file" do
+  it "refuses to overwrite a hand-written file in its own folder" do
+    song.update!(folder: "starlight")
     dir.mkpath
     dir.join("live.rb").write("# by hand\nplay 60\n")
     expect { export.call }.to raise_error(SongExport::HandWritten, /live.rb/)
     expect(dir.join("live.rb").read).to eq("# by hand\nplay 60\n")
     expect(dir.join("NOTES.md")).not_to exist
+  end
+
+  describe "the song's folder" do
+    it "is named after the title on first export and kept" do
+      export.call
+      expect(song.reload.folder).to eq("starlight")
+    end
+
+    it "stays when the title changes, so the history in the repo holds" do
+      export.call
+      song.update!(title: "Starlight (live)", sheet: song.sheet.merge("title" => "Starlight (live)"))
+      expect(described_class.new(song.reload, root: @root).dir).to eq(dir)
+    end
+
+    it "gets a number when another song has the name already" do
+      export.call
+      other = create(:song, :ready)
+      expect(described_class.new(other, root: @root).call.dir).to eq(@root.join("starlight_2"))
+    end
+
+    it "steps around a folder written by hand" do
+      dir.mkpath
+      dir.join("live.rb").write("play 60\n")
+      expect(export.call.dir).to eq(@root.join("starlight_2"))
+    end
+
+    it "takes over an exported folder no song owns" do
+      dir.mkpath
+      dir.join("live.rb").write("#{SongExport::MARK}\nplay 60\n")
+      expect(export.call.dir).to eq(dir)
+    end
+  end
+
+  describe "a song written by hand" do
+    let(:song) do
+      create(:song, :ready, :manual, artist: "").tap { |s| s.update!(sheet: s.sheet.merge("artist" => "")) }
+    end
+
+    it "is not called a cover or unchecked" do
+      export.call
+      notes = dir.join("NOTES.md").read
+      expect(notes).to include("Eigener Song")
+      expect(notes).not_to include("Cover", "ungeprüft")
+    end
+  end
+
+  describe "removing" do
+    it "takes the exported files away, and the folder once it is empty" do
+      export.call
+      export.remove
+      expect(dir).not_to exist
+    end
+
+    it "leaves files written by hand where they are" do
+      export.call
+      dir.join("lyrics.md").write("mine")
+      export.remove
+      expect(dir.children.map { |f| f.basename.to_s }).to eq(["lyrics.md"])
+    end
+
+    it "does not mind a song that was never exported" do
+      expect { export.remove }.not_to raise_error
+    end
+  end
+
+  describe "every song at once" do
+    it "writes each ready song and steps over hand-written ones" do
+      create(:song, :ready, folder: "starlight")
+      @root.join("starlight").mkpath
+      @root.join("starlight/live.rb").write("play 60\n")
+      other = create(:song, :ready).tap { |s| s.update!(title: "Bliss", sheet: s.sheet.merge("title" => "Bliss")) }
+      create(:song)
+      described_class.mirror_all(root: @root)
+      expect(@root.join("bliss/live.rb")).to exist
+      expect(@root.join("starlight/live.rb").read).to eq("play 60\n")
+      expect(other.reload.folder).to eq("bliss")
+    end
   end
 end

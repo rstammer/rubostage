@@ -49,5 +49,18 @@ RSpec.describe Song do
       expect(song.playable_code).to include("live_loop :conductor")
       expect(song.reload.code).to be_present
     end
+
+    it "lands in the songs folder whenever it is built" do
+      song.rebuild_code!
+      expect(Setting.songs_root.join("starlight/live.rb")).to exist
+    end
+
+    it "is built even when the folder holds a hand-written song" do
+      song.update!(folder: "starlight")
+      Setting.songs_root.join("starlight").mkpath
+      Setting.songs_root.join("starlight/live.rb").write("play 60\n")
+      expect { song.rebuild_code! }.not_to raise_error
+      expect(song.reload.code).to be_present
+    end
   end
 end

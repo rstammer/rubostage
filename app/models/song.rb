@@ -30,9 +30,18 @@ class Song < ApplicationRecord
     code.presence || rebuild_code!
   end
 
+  # Each build also lands in the songs folder. A song taken over by hand
+  # there, or a folder that has gone away, is no reason to lose the build.
   def rebuild_code!
     update!(code: groove.code)
+    export
     code
+  end
+
+  def export
+    SongExport.new(self).call
+  rescue SongExport::HandWritten, SystemCallError => e
+    Rails.logger.info("Song #{id} not written to the songs folder: #{e.message}")
   end
 
   # Just the voices, for swapping in the arrangement while the song plays.
