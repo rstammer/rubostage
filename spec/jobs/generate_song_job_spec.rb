@@ -23,7 +23,7 @@ RSpec.describe GenerateSongJob do
     expect(song.title).to eq("Starlight")
     expect(song.bpm).to eq(122)
     expect(song.sheet["form"]).to eq(["Verse"])
-    expect(song.code).to include("use_bpm 122")
+    expect(song.code).to include("use_bpm 122", "/stage/step")
   end
 
   it "asks for the full arrangement once the groove plays" do

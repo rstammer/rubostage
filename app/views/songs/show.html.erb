@@ -138,6 +138,8 @@
       <%= link_to "Bearbeiten", edit_song_path(@song), class: "ring-button" %>
       <%= button_to "Löschen", song_path(@song), method: :delete, class: "ring-button",
             form: {data: {turbo_confirm: "#{@song.display_title} wirklich löschen?"}} %>
+      <%= button_to "Code neu bauen", song_code_path(@song), class: "ring-button",
+            title: "Baut den Sonic-Pi-Code mit dem aktuellen Groove neu" %>
       <%= button_to "Ins Repo", song_export_path(@song), class: "ring-button",
             title: "Schreibt live.rb und NOTES.md in den Songs-Ordner der Band" %>
     </div>

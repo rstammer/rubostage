@@ -8,6 +8,7 @@ class ArrangeSongJob < ApplicationJob
     song.update!(arrangement_status: "pending")
     arrangement = ArrangementWriter.new.call(song.lead_sheet, wish: wish)
     song.update!(arrangement: arrangement.to_h, arrangement_status: "ready")
+    song.rebuild_code!
     upgrade(song) if NowPlaying.current_song_id == song.id
   rescue Arrangement::Invalid, ClaudeCli::Failed => e
     Rails.logger.warn("Arrangement for song #{song.id} failed: #{e.message}")

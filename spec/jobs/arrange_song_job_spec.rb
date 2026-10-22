@@ -58,4 +58,10 @@ RSpec.describe ArrangeSongJob do
     expect(song.arrangement_status).to eq("ready")
     expect(song.arrangement["sounds"]["bass"]).to eq("tb303")
   end
+
+  it "builds the code anew with the arrangement" do
+    song.update!(code: "play 60")
+    described_class.perform_now(song)
+    expect(song.reload.code).to eq(song.groove.code)
+  end
 end

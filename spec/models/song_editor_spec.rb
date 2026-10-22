@@ -180,4 +180,12 @@ RSpec.describe SongEditor do
       expect(song).not_to be_persisted
     end
   end
+
+  describe "the code" do
+    it "is built anew from what was saved" do
+      song.update!(code: "play 60")
+      described_class.new(song, params(bpm: "118")).save
+      expect(song.reload.code).to include("use_bpm 118")
+    end
+  end
 end

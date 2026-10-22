@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     resource :command, only: :create
     resource :export, only: :create
     resource :arrangement, only: :create
+    resource :code, only: :create
   end
   resource :playback, only: :destroy
   resource :sonic_pi, only: :create, controller: "sonic_pi"

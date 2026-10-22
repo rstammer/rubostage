@@ -244,4 +244,19 @@ RSpec.describe "Songs", type: :request do
       expect(Song.exists?(song.id)).to be(false)
     end
   end
+
+  describe "rebuilding the code" do
+    let(:song) { create(:song, :ready, code: "play 60") }
+
+    it "is offered on the song" do
+      get song_path(song)
+      expect(response.body).to include(song_code_path(song))
+    end
+
+    it "builds the code anew from the current groove" do
+      post song_code_path(song)
+      expect(song.reload.code).to include("live_loop :conductor")
+      expect(response).to redirect_to(song_path(song))
+    end
+  end
 end

@@ -9,8 +9,9 @@ class GenerateSongJob < ApplicationJob
 
     song.update!(
       title: sheet.title, artist: sheet.artist, key: sheet.key, bpm: sheet.bpm,
-      sheet: sheet.to_h, code: code, status: "ready", error: nil
+      sheet: sheet.to_h, status: "ready", error: nil
     )
+    song.rebuild_code!
     play(song)
     ArrangeSongJob.perform_later(song)
   rescue SongSheet::Invalid, ClaudeCli::Failed => e

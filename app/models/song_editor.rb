@@ -53,6 +53,7 @@ class SongEditor
       title: sheet.title, artist: sheet.artist, key: sheet.key, bpm: sheet.bpm, sheet: sheet.to_h,
       arrangement: (build_arrangement(sheet).to_h if arranged?), riff_track: riffs.to_h, status: "ready"
     )
+    song.rebuild_code!
     @swappable = structure(sheet) == before
     true
   rescue SongSheet::Invalid, Arrangement::Invalid, Tab::Invalid => e

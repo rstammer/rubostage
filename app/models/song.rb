@@ -23,10 +23,16 @@ class Song < ApplicationRecord
     SongSheet.from_h(sheet) if ready? && sheet.present?
   end
 
-  # Built fresh from the sheet on every play, so songs made before a change to
-  # the groove pick it up too.
+  # The code is kept, not built on every play: a song sounds the way it did
+  # when it was last saved or arranged, even after the groove has changed.
+  # rebuild_code! brings a song up to the current groove.
   def playable_code
-    groove.code
+    code.presence || rebuild_code!
+  end
+
+  def rebuild_code!
+    update!(code: groove.code)
+    code
   end
 
   # Just the voices, for swapping in the arrangement while the song plays.

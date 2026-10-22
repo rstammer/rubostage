@@ -30,4 +30,24 @@ RSpec.describe Song do
   it "shows a placeholder for a hand-written song without a title" do
     expect(build(:song, :manual, title: nil).display_title).to eq("Neuer Song")
   end
+
+  describe "its code" do
+    let(:song) { create(:song, :ready, code: nil) }
+
+    it "builds and keeps it from sheet and arrangement" do
+      song.rebuild_code!
+      expect(song.reload.code).to eq(song.groove.code)
+      expect(song.code).to include("/stage/step")
+    end
+
+    it "plays what it keeps, so a later change to the groove leaves it alone" do
+      song.update!(code: "play 60")
+      expect(song.playable_code).to eq("play 60")
+    end
+
+    it "builds the code on first play when there is none yet" do
+      expect(song.playable_code).to include("live_loop :conductor")
+      expect(song.reload.code).to be_present
+    end
+  end
 end
