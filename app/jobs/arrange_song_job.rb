@@ -1,7 +1,7 @@
 # Stage two: asks for the full arrangement and, when the song is still
 # playing, swaps its voices in place. The conductor keeps running, so the song
 # stays where it is in the form and the new sound comes in at a section
-# boundary. Robin may add a wish ("quieter, reggae in the chorus"), and a
+# boundary. A wish may come along ("quieter, reggae in the chorus"), and a
 # song that already has an arrangement keeps it if the new one fails.
 class ArrangeSongJob < ApplicationJob
   def perform(song, wish: nil)

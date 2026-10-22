@@ -1,6 +1,6 @@
 require "open3"
 
-# Asks the local Claude Code with Robin's login: no API key, but slower. A
+# Asks the local Claude Code with the local user's login: no API key, but slower. A
 # stopgap — anything that answers #call(prompt) with text can take its place.
 class ClaudeCli
   class Failed < StandardError; end

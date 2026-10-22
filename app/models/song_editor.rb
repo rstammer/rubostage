@@ -1,5 +1,5 @@
 # Edits a song after the fact: title, key, tempo, form, the chords of each
-# section, how the band plays it, and the riffs Robin tabs in. Everything is
+# section, how the band plays it, and the riffs tabbed in. Everything is
 # checked the way a fresh song is, and nothing is stored unless all of it
 # reads.
 class SongEditor
@@ -24,7 +24,7 @@ class SongEditor
     }, rows: rows + [SongEditor::Row.blank])
   end
 
-  # A song Robin writes from scratch: nothing filled in but the tab settings,
+  # A song written from scratch: nothing filled in but the tab settings,
   # and a few rows to start the first sections in.
   def self.blank(song)
     new(song, {"tuning" => "standard", "tone" => "crunch"}, rows: Array.new(3) { SongEditor::Row.blank })

@@ -1,6 +1,6 @@
 class Song < ApplicationRecord
   STATUSES = %w[pending ready failed].freeze
-  # A wish is written by Claude; a manual song is Robin's own sheet.
+  # A wish is written by Claude; a manual song is written by hand.
   ORIGINS = %w[wish manual].freeze
 
   validates :request, presence: true, if: :wish?

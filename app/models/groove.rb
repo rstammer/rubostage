@@ -333,7 +333,7 @@ class Groove
     RUBY
   end
 
-  # Robin's riffs, played as written. A section's tab repeats until the
+  # The riffs, played as written. A section's tab repeats until the
   # section ends; a note held for 0 steps is a muted dead note.
   def riff_voice
     crunch = @riffs.tone == "crunch"

@@ -37,7 +37,7 @@ RSpec.describe ArrangementWriter do
     expect(client.prompt).to match(/not a transcription/i)
   end
 
-  it "passes on what Robin wishes for the arrangement" do
+  it "passes on a wish for the arrangement" do
     described_class.new(client: client).call(sheet, wish: "ruhiger, Reggae im Refrain")
     expect(client.prompt).to include("ruhiger, Reggae im Refrain")
   end
@@ -47,7 +47,7 @@ RSpec.describe ArrangementWriter do
     expect(client.prompt).not_to match(/wish/i)
   end
 
-  it "names no band for a song of Robin's own" do
+  it "names no band for a song of one's own" do
     own = SongSheet.from_h(sheet.to_h.merge("title" => "Rahmersee", "artist" => ""))
     described_class.new(client: client).call(own)
     expect(client.prompt).to include("Rahmersee, the busker's own song")

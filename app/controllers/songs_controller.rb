@@ -45,7 +45,7 @@ class SongsController < ApplicationController
 
   private
 
-  # Robin's own sheet: stored as it is, no Claude involved.
+  # A sheet written by hand: stored as it is, no Claude involved.
   def create_manual
     @song = Song.new(origin: "manual")
     @editor = SongEditor.new(@song, edit_params)

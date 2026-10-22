@@ -1,6 +1,6 @@
 # One section as the editor shows it: its name (and the name it had, so a
 # renamed section keeps its arrangement and tab), the chords as text, how the
-# band plays it, and Robin's tab.
+# band plays it, and its tab.
 class SongEditor::Row
   FIELDS = %i[original name chords energy groove guitar swing fill tab].freeze
 

@@ -1,4 +1,4 @@
-# The riffs Robin writes for a song: a tab per section, the tuning they are
+# The riffs written for a song: a tab per section, the tuning they are
 # fretted in, and whether they play crunchy or clean. Groove turns them into
 # a voice of its own, on top of whatever the arrangement plays.
 class RiffTrack

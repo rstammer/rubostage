@@ -163,7 +163,7 @@ RSpec.describe SongEditor do
       expect(editor).not_to be_arranged
     end
 
-    it "stores the sheet as a ready song of Robin's own" do
+    it "stores the sheet as a ready song of one's own" do
       rows = {"0" => {"original" => "", "name" => "Verse", "chords" => "Am | F | C | G"},
               "1" => {"original" => "", "name" => "", "chords" => ""}}
       editor = described_class.new(song, params(title: "Rahmersee", artist: "", key: "Am", bpm: "96", form: "", sections: rows))

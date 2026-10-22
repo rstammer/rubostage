@@ -45,7 +45,7 @@ RSpec.describe ArrangeSongJob do
     expect(song.reload.arrangement_status).to eq("ready")
   end
 
-  it "hands Robin's wish to the writer" do
+  it "hands the wish to the writer" do
     described_class.perform_now(song, wish: "mehr Funk")
     expect(writer).to have_received(:call).with(anything, wish: "mehr Funk")
   end

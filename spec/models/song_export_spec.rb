@@ -46,7 +46,7 @@ RSpec.describe SongExport do
     expect(dir.join("NOTES.md").read).to include("| Verse | 3 | punk | power |")
   end
 
-  it "keeps Robin's tabs in the notes" do
+  it "keeps the tabs in the notes" do
     tab = "e|----------------|\nB|----------------|\nG|----------------|\nD|----------------|\nA|----------------|\nE|0---------------|\n"
     song.update!(riff_track: {"tuning" => "drop_d", "tone" => "clean", "tabs" => {"Verse" => tab}})
     export.call

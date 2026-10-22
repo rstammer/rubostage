@@ -1,5 +1,5 @@
-# "Arrangieren lassen" / "Neu arrangieren": the song's sheet, with Robin's
-# wish if he gave one, goes to Claude for a fresh arrangement.
+# "Arrangieren lassen" / "Neu arrangieren": the song's sheet, with the player's
+# wish if there is one, goes to Claude for a fresh arrangement.
 class ArrangementsController < ApplicationController
   def create
     song = Song.find(params[:song_id])

@@ -12,7 +12,7 @@ RSpec.describe Song do
     expect(build(:song, request: " ")).not_to be_valid
   end
 
-  it "needs no wish when Robin writes it himself" do
+  it "needs no wish when written by hand" do
     song = build(:song, :manual)
 
     expect(song).to be_valid
@@ -27,7 +27,7 @@ RSpec.describe Song do
     expect(build(:song, title: nil).display_title).to eq("Starlight von Muse")
   end
 
-  it "shows a placeholder for a song of his own without a title" do
+  it "shows a placeholder for a hand-written song without a title" do
     expect(build(:song, :manual, title: nil).display_title).to eq("Neuer Song")
   end
 end
