@@ -1,8 +1,11 @@
 class Song < ApplicationRecord
   STATUSES = %w[pending ready failed].freeze
+  # A wish is written by Claude; a manual song is Robin's own sheet.
+  ORIGINS = %w[wish manual].freeze
 
-  validates :request, presence: true
+  validates :request, presence: true, if: :wish?
   validates :status, inclusion: {in: STATUSES}
+  validates :origin, inclusion: {in: ORIGINS}
 
   broadcasts_refreshes
 
@@ -10,6 +13,10 @@ class Song < ApplicationRecord
 
   STATUSES.each do |name|
     define_method(:"#{name}?") { status == name }
+  end
+
+  ORIGINS.each do |name|
+    define_method(:"#{name}?") { origin == name }
   end
 
   def lead_sheet
@@ -41,6 +48,6 @@ class Song < ApplicationRecord
   end
 
   def display_title
-    title.presence || request
+    title.presence || request.presence || "Neuer Song"
   end
 end

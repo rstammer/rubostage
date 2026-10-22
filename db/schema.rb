@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_15_204213) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_180715) do
   create_table "songs", force: :cascade do |t|
-    t.string "request", null: false
+    t.string "request"
     t.string "title"
     t.string "artist"
     t.string "key"
@@ -26,5 +26,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_204213) do
     t.json "arrangement"
     t.string "arrangement_status", default: "none", null: false
     t.json "riff_track"
+    t.string "origin", default: "wish", null: false
   end
 end

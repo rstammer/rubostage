@@ -2,6 +2,11 @@ FactoryBot.define do
   factory :song do
     request { "Starlight von Muse" }
 
+    trait :manual do
+      origin { "manual" }
+      request { nil }
+    end
+
     trait :ready do
       title { "Starlight" }
       artist { "Muse" }
