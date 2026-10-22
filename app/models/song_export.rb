@@ -191,7 +191,8 @@ class SongExport
     track = @song.riffs
     return if track.nil? || track.empty?
 
-    tabs = track.tabs.map { |name, text| "### #{name}\n\n```text\n#{text.strip}\n```\n" }
+    tabs = track.tabs.map { |name, text| "### #{name}\n\n```text\n#{text.strip}\n```\n" } +
+      track.bass_tabs.map { |name, text| "### #{name} (Bass)\n\n```text\n#{text.strip}\n```\n" }
     <<~MD
       ## Riffs
 

@@ -71,7 +71,8 @@ class Groove
       final = [#{final_chord.bass_note}, #{final_chord.voicing.inspect}]
     RUBY
     block += arranged_data if @arrangement
-    block += riffs_data if @riffs
+    block += riffs_data if guitar_riffs?
+    block += bass_riffs_data if bass_riffs?
     block
   end
 
@@ -106,8 +107,19 @@ class Groove
   end
 
   def voices_block
-    voices = @arrangement ? arranged_voices : plain_voices
-    @riffs ? voices + "\n" + riff_voice : voices
+    voices = [@arrangement ? arranged_voices : plain_voices]
+    voices << riff_voice if guitar_riffs?
+    voices << bass_riff_voice if bass_riffs?
+    voices.join("\n")
+  end
+
+  def guitar_riffs? = @riffs&.tabs&.any?
+
+  def bass_riffs? = @riffs&.bass_tabs&.any?
+
+  # Where a bass riff plays, the bass line rests.
+  def unless_bass_riff
+    bass_riffs? ? " unless bass_riffs[form[pos]]" : ""
   end
 
   def plain_voices
@@ -139,7 +151,7 @@ class Groove
         with_fx :lpf, cutoff: 90 do
           sections[form[pos]].each do |root, _voicing, beats|
             (beats * 2).times do
-              play root, release: 0.4, amp: 0.55, divisor: 1, depth: 1.2
+              play root, release: 0.4, amp: 0.55, divisor: 1, depth: 1.2#{unless_bass_riff}
               sleep 0.5
             end
           end
@@ -248,7 +260,7 @@ class Groove
             if hit
               late = (step % 4 == 2) ? part[:swing] * 0.5 : 0
               time_warp late do
-                play chords[at[slot / 4]][0] + hit[1], release: 0.3, amp: 0.6 * levels[part[:energy]]
+                play chords[at[slot / 4]][0] + hit[1], release: 0.3, amp: 0.6 * levels[part[:energy]]#{unless_bass_riff}
               end
             end
             sleep 0.25
@@ -330,6 +342,48 @@ class Groove
       riffs = [
       #{riffs_literal}
       ]
+    RUBY
+  end
+
+  def bass_riffs_data
+    <<~RUBY
+
+      # The same for the bass riffs.
+      bass_riffs = [
+      #{riffs_literal(bass: true)}
+      ]
+    RUBY
+  end
+
+  # The bass riffs, played as written on the arrangement's bass sound. A
+  # section's tab repeats until the section ends.
+  def bass_riff_voice
+    <<~RUBY
+      live_loop :bass_riff do
+        pos = sync(:section)[0]
+        stop if pos < 0
+        riff = bass_riffs[form[pos]]
+        if riff
+          use_synth :#{@arrangement ? @arrangement.sounds[:bass] : :fm}
+          with_fx :lpf, cutoff: 90 do
+            (sections[form[pos]].sum { |entry| entry[2] } * 4).times do |slot|
+              step = slot % riff[0]
+              late = (step % 4 == 2) ? riff[1] * 0.5 : 0
+              riff[3].each do |hit_step, pitch, held|
+                next unless hit_step == step
+                time_warp late do
+                  if held == 0
+                    play pitch, release: 0.05, amp: 0.3 * riff[2]
+                  else
+                    play pitch, sustain: held * 0.25 - 0.1, release: 0.1, amp: 0.6 * riff[2]
+                  end
+                end
+              end
+              sleep 0.25
+            end
+          end
+        end
+      end
     RUBY
   end
 
@@ -426,9 +480,9 @@ class Groove
     end.join("\n")
   end
 
-  def riffs_literal
+  def riffs_literal(bass: false)
     @sheet.sections.map do |section|
-      tab = @riffs.tab(section.name)
+      tab = bass ? @riffs.bass_tab(section.name) : @riffs.tab(section.name)
       next "  nil, # #{section.name}" unless tab
 
       part = @arrangement&.section(section.name)

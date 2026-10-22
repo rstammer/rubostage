@@ -30,7 +30,10 @@ von der KI (Wunsch, `origin: "wish"`) oder aus dem leeren Editor
    Tasten P/S/R/N/E/1–9. **Endlos** (Taste L) ist ein rastender Schalter:
    `set :stage_loop` im Sonic-Pi-Zustand, in der App `Player.looping`; jeder
    Start schickt ihn mit. „Schluss“ beendet auch eine Schleife.
-5. Songs sind editierbar (`SongEditor`), Riffs als ASCII-Tab (`Tab`, `RiffTrack`).
+5. Songs sind editierbar (`SongEditor`), Riffs als ASCII-Tab (`Tab`, `RiffTrack`):
+   pro Teil per Häkchen Gitarre (6 Saiten) und/oder Bass (4 Saiten, = tiefste
+   vier Gitarrensaiten −12, folgt der Stimmung). Ein Bass-Riff lässt die
+   Basslinie in seinem Teil pausieren (`unless bass_riffs[form[pos]]`).
    Ein leerer Takt (`[]` im Sheet, `%` auf dem Chart) hält den Akkord davor;
    alles, was Akkorde zählt, geht über `Section#steps(sheet.beats)`.
    **Takt** pro Song (`sheet["beats"]`, 4 oder 2): bestimmt nur die Akkorddauer;

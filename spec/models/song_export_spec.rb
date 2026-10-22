@@ -47,6 +47,14 @@ RSpec.describe SongExport do
     expect(dir.join("NOTES.md").read).to include("**Takt:** 2/4")
   end
 
+  it "keeps the bass tabs in the notes" do
+    bass = "G|----------------|\nD|----------------|\nA|----------------|\nE|0---------------|\n"
+    song.update!(riff_track: {"bass_tabs" => {"Verse" => bass}})
+    export.call
+    expect(dir.join("NOTES.md").read).to include("### Verse (Bass)", "E|0---------------|")
+    expect(dir.join("live.rb").read).to include("live_loop :bass_riff")
+  end
+
   it "writes a held bar as % in the notes" do
     song.update!(sheet: song.sheet.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["E"]]}]))
     export.call

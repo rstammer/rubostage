@@ -14,6 +14,9 @@
 #
 # The fingering comes from whoever writes the tab: it is played as written,
 # never worked out from pitches.
+#
+# A bass tab has four lines (G D A E). Its strings are the guitar's lowest
+# four an octave down, so every tuning works for both.
 class Tab
   class Invalid < StandardError; end
 
@@ -25,6 +28,7 @@ class Tab
   }.freeze
 
   STRINGS = 6
+  BASS_STRINGS = 4
   STEPS_PER_BAR = 16
   UNKNOWN = %r{[^0-9x\-hpbr/\\~v]}
   LABEL = /\A\s*([A-Ga-g][#b]?)?\s*\|/
@@ -32,31 +36,38 @@ class Tab
   NOTE_NAMES = %w[C Db D Eb E F Gb G Ab A Bb B].freeze
 
   # The string names a tab in this tuning starts its lines with.
-  def self.labels(tuning)
-    names = TUNINGS.fetch(tuning).reverse.map { |pitch| NOTE_NAMES[pitch % 12] }
-    [names.first.downcase, *names.drop(1)]
+  def self.labels(tuning, bass: false)
+    names = open_strings(tuning, bass).reverse.map { |pitch| NOTE_NAMES[pitch % 12] }
+    bass ? names : [names.first.downcase, *names.drop(1)]
+  end
+
+  # Low string first.
+  def self.open_strings(tuning, bass)
+    guitar = TUNINGS.fetch(tuning.to_s) { raise Invalid, "unknown tuning #{tuning.inspect}" }
+    bass ? guitar.first(BASS_STRINGS).map { |pitch| pitch - 12 } : guitar
   end
 
   # Notes as [step, pitch, steps held]; a dead note is held for 0 steps.
   attr_reader :steps, :notes
 
-  def self.parse(text, tuning: "standard")
-    open_strings = TUNINGS.fetch(tuning.to_s) { raise Invalid, "unknown tuning #{tuning.inspect}" }
+  def self.parse(text, tuning: "standard", bass: false)
+    open_strings = open_strings(tuning, bass)
+    count = open_strings.size
     lines = text.to_s.lines.map(&:strip).reject(&:empty?)
     return nil if lines.empty?
 
-    unless (lines.size % STRINGS).zero?
-      raise Invalid, "a tab needs six lines per block, one per string, got #{lines.size}"
+    unless (lines.size % count).zero?
+      raise Invalid, "a tab needs #{(count == STRINGS) ? "six" : "four"} lines per block, one per string, got #{lines.size}"
     end
 
-    strings = Array.new(STRINGS) { +"" }
-    lines.each_slice(STRINGS) do |block|
+    strings = Array.new(count) { +"" }
+    lines.each_slice(count) do |block|
       read_block(block).each_with_index { |steps, i| strings[i] << steps }
     end
     new(strings, open_strings.reverse)
   end
 
-  # The six lines of one block, as the steps of each string with labels and
+  # The lines of one block, as the steps of each string with labels and
   # bar lines taken out.
   def self.read_block(block)
     strings = block.each_with_index.map do |line, i|

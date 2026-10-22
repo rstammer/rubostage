@@ -3,7 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 const BAR = 16
 const LABEL = /^\s*([A-Ga-g][#b]?)?\s*\|/
 
-// Helps type a tab. "+ Takt" adds an empty bar to the last six lines, and
+// Helps type a tab. "+ Takt" adds an empty bar to the last block of lines
+// (six for the guitar, four for the bass), and
 // writes out the strings first when the box is empty. The line under the box
 // says how many bars it reads, or what does not fit. The server checks again
 // on save; this is only so mistakes show while typing.
@@ -16,12 +17,13 @@ export default class extends Controller {
   }
 
   addBar() {
+    const count = this.stringsValue.length
     let lines = this.lines()
     if (lines.length === 0) lines = this.stringsValue.map((name) => `${name}|`)
-    if (lines.length % 6 !== 0) return this.check()
+    if (lines.length % count !== 0) return this.check()
 
     const empty = "-".repeat(BAR) + "|"
-    lines = lines.map((line, i) => (i >= lines.length - 6 ? line + empty : line))
+    lines = lines.map((line, i) => (i >= lines.length - count ? line + empty : line))
     this.inputTarget.value = lines.join("\n") + "\n"
     this.check()
     this.inputTarget.focus()
@@ -33,12 +35,13 @@ export default class extends Controller {
 
   describe(lines) {
     if (lines.length === 0) return "Kein Riff in diesem Teil."
-    if (lines.length % 6 !== 0) return `${lines.length} Zeilen – ein Tab braucht sechs pro Block, eine je Saite.`
+    const count = this.stringsValue.length
+    if (lines.length % count !== 0) return `${lines.length} Zeilen – ein Tab braucht ${count} pro Block, eine je Saite.`
 
     let bars = 0
-    for (let start = 0; start < lines.length; start += 6) {
+    for (let start = 0; start < lines.length; start += count) {
       const counts = []
-      for (const line of lines.slice(start, start + 6)) {
+      for (const line of lines.slice(start, start + count)) {
         const name = (line.match(LABEL) || [])[1] || "?"
         const parts = line.replace(LABEL, "").split("|").filter((part) => part !== "")
         const wrong = parts.findIndex((part) => part.length !== BAR)

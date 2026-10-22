@@ -95,4 +95,26 @@ RSpec.describe Tab do
       expect { described_class.parse(riff, tuning: "open_g") }.to raise_error(Tab::Invalid, /tuning/)
     end
   end
+
+  describe "for the bass" do
+    let(:bass_tab) { "G|----------------|\nD|----------------|\nA|--------2-------|\nE|0-------------3-|\n" }
+
+    it "reads four strings, an octave below the guitar's lowest four" do
+      tab = described_class.parse(bass_tab, bass: true)
+      expect(tab.notes.map { |step, pitch, _held| [step, pitch] }).to eq([[0, 28], [8, 35], [14, 31]])
+    end
+
+    it "follows the tuning of the song" do
+      tab = described_class.parse(bass_tab, tuning: "drop_d", bass: true)
+      expect(tab.notes.first[1]).to eq(26)
+    end
+
+    it "wants four lines per block" do
+      expect { described_class.parse(bass_tab.lines.first(3).join, bass: true) }.to raise_error(Tab::Invalid, /four/)
+    end
+
+    it "names its strings from the top" do
+      expect(described_class.labels("standard", bass: true)).to eq(%w[G D A E])
+    end
+  end
 end

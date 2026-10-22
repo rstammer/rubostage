@@ -70,6 +70,22 @@ RSpec.describe SongEditor do
       expect(described_class.for(song).beats).to eq(2)
     end
 
+    it "stores a bass tab next to the guitar's" do
+      bass = "G|----------------|\nD|----------------|\nA|----------------|\nE|0---------------|\n"
+      rows = {"0" => {"original" => "Verse", "name" => "Verse", "chords" => "B | C#m | G#m | E",
+                      "riff_guitar" => "1", "tab" => tab, "riff_bass" => "1", "bass_tab" => bass}}
+      described_class.new(song, params(sections: rows)).save
+      expect(song.reload.riffs.tabs).to eq("Verse" => tab)
+      expect(song.riffs.bass_tabs).to eq("Verse" => bass)
+      expect(described_class.for(song).rows.first.bass_tab).to eq(bass)
+    end
+
+    it "drops a riff whose box is unticked" do
+      rows = {"0" => {"original" => "Verse", "name" => "Verse", "chords" => "B | C#m | G#m | E", "riff_guitar" => "0", "tab" => tab}}
+      described_class.new(song, params(sections: rows)).save
+      expect(song.reload.riffs.tabs).to be_empty
+    end
+
     it "shows a held bar as %" do
       song.update!(sheet: song.sheet.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["E"]]}]))
       expect(described_class.for(song).rows.first.chords).to eq("B | % | E")
@@ -121,7 +137,7 @@ RSpec.describe SongEditor do
     it "stores the tabs with their tuning and tone" do
       rows = {"0" => {"original" => "Verse", "name" => "Verse", "chords" => "B | E", "tab" => tab}}
       described_class.new(song, params(sections: rows, tuning: "half_down", tone: "clean")).save
-      expect(song.reload.riff_track).to eq({"tuning" => "half_down", "tone" => "clean", "tabs" => {"Verse" => tab}})
+      expect(song.reload.riff_track).to eq({"tuning" => "half_down", "tone" => "clean", "tabs" => {"Verse" => tab}, "bass_tabs" => {}})
     end
 
     describe "refuses and keeps what was typed" do

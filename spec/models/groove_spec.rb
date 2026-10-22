@@ -27,6 +27,25 @@ RSpec.describe Groove do
     expect(CodeCheck.problems(code)).to be_empty
   end
 
+  describe "a bass riff" do
+    let(:bass_tab) { "G|----------------|\nD|----------------|\nA|--------2-------|\nE|0-------------3-|\n" }
+    let(:riffs) { RiffTrack.from_h("bass_tabs" => {"Verse" => bass_tab}) }
+    let(:code) { described_class.new(sheet, riffs: riffs).code }
+
+    it "plays in a voice of its own, and the bass line rests where it plays" do
+      expect(code).to include("live_loop :bass_riff", "bass_riffs = [", "unless bass_riffs[form[pos]]")
+      expect(code).not_to include("live_loop :riff ")
+      expect(CodeCheck.problems(code)).to be_empty
+    end
+
+    it "lets the arranged bass rest too" do
+      arranged = Arrangement.from_h({"sections" => {}}, sheet)
+      code = described_class.new(sheet, arrangement: arranged, riffs: riffs).code
+      expect(code.scan("unless bass_riffs[form[pos]]").size).to be >= 1
+      expect(CodeCheck.problems(code)).to be_empty
+    end
+  end
+
   it "sets the tempo above the loops" do
     expect(code.index("use_bpm 122")).to be < code.index("live_loop :")
   end

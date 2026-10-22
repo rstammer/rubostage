@@ -15,7 +15,8 @@ class SongEditor
         original: section.name, name: section.name,
         chords: section.chart,
         energy: part&.energy, groove: part&.groove&.to_s, guitar: part&.guitar&.to_s,
-        swing: part&.swing, fill: part&.fill || false, tab: riffs.tabs[section.name].to_s
+        swing: part&.swing, fill: part&.fill || false, tab: riffs.tabs[section.name].to_s,
+        bass_tab: riffs.bass_tabs[section.name].to_s
       )
     end
     new(song, {
@@ -49,7 +50,11 @@ class SongEditor
   def save
     before = song.lead_sheet&.then { |sheet| structure(sheet) }
     sheet = build_sheet
-    riffs = RiffTrack.from_h({"tuning" => tuning, "tone" => tone, "tabs" => kept_rows.to_h { |row| [row.name, row.tab] }}).validate!
+    riffs = RiffTrack.from_h({
+      "tuning" => tuning, "tone" => tone,
+      "tabs" => kept_rows.to_h { |row| [row.name, row.tab] },
+      "bass_tabs" => kept_rows.to_h { |row| [row.name, row.bass_tab] }
+    }).validate!
     song.update!(
       title: sheet.title, artist: sheet.artist, key: sheet.key, bpm: sheet.bpm, sheet: sheet.to_h,
       arrangement: (build_arrangement(sheet).to_h if arranged?), riff_track: riffs.to_h, status: "ready"

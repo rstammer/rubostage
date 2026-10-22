@@ -8,7 +8,7 @@
   </p>
 <% end %>
 
-<%= form_with url: (@song.new_record? ? songs_path : song_path(@song)), method: (@song.new_record? ? :post : :patch), scope: :song, class: "mt-10 space-y-6" do %>
+<%= form_with data: {controller: "reveal"}, url: (@song.new_record? ? songs_path : song_path(@song)), method: (@song.new_record? ? :post : :patch), scope: :song, class: "mt-10 space-y-6" do %>
   <%= hidden_field_tag "song[origin]", "manual", id: nil if @song.new_record? %>
   <section class="<%= card %> grid gap-5 sm:grid-cols-2">
     <div>
@@ -116,15 +116,36 @@
         </div>
       <% end %>
 
-      <div class="mt-5" data-controller="tab" data-tab-strings-value="<%= Tab.labels(@editor.tuning.presence_in(Tab::TUNINGS.keys) || "standard").to_json %>">
-        <div class="flex items-center justify-between gap-3">
-          <%= label_tag id.call(:tab), "Riff (Tab)", class: label %>
-          <button type="button" class="ring-button !px-4 !py-1 !text-base" data-action="tab#addBar">+ Takt</button>
+      <% tuning = @editor.tuning.presence_in(Tab::TUNINGS.keys) || "standard" %>
+      <% riffs = [
+           {box: :riff_guitar, field: :tab, title: "Gitarre", text: row.tab, labels: Tab.labels(tuning), rows: 7},
+           {box: :riff_bass, field: :bass_tab, title: "Bass", text: row.bass_tab, labels: Tab.labels(tuning, bass: true), rows: 5}
+         ] %>
+      <div class="mt-5">
+        <p class="<%= label %>">Riff</p>
+        <div class="mt-2 flex flex-wrap gap-x-6 gap-y-2">
+          <% riffs.each do |riff| %>
+            <label class="flex items-center gap-3 text-lg">
+              <%= hidden_field_tag name.call(riff[:box]), "0", id: nil %>
+              <%= check_box_tag name.call(riff[:box]), "1", riff[:text].present?, id: id.call(riff[:box]),
+                    class: "size-5 accent-accent", data: {action: "reveal#toggle", reveal_panel_param: id.call(riff[:field])} %>
+              <%= riff[:title] %>
+            </label>
+          <% end %>
         </div>
-        <%= text_area_tag name.call(:tab), row.tab, id: id.call(:tab), rows: 7, wrap: "off", spellcheck: false,
-              class: "#{field} overflow-x-auto font-mono text-base leading-snug whitespace-pre",
-              data: {tab_target: "input", action: "input->tab#check"} %>
-        <p class="mt-1 text-muted" data-tab-target="status" aria-live="polite"></p>
+        <% riffs.each do |riff| %>
+          <div id="<%= id.call(riff[:field]) %>_panel" class="mt-4" <%= "hidden" if riff[:text].blank? %>
+               data-controller="tab" data-tab-strings-value="<%= riff[:labels].to_json %>">
+            <div class="flex items-center justify-between gap-3">
+              <%= label_tag id.call(riff[:field]), "#{riff[:title]} (#{riff[:labels].join(" ")})", class: label %>
+              <button type="button" class="ring-button !px-4 !py-1 !text-base" data-action="tab#addBar">+ Takt</button>
+            </div>
+            <%= text_area_tag name.call(riff[:field]), riff[:text], id: id.call(riff[:field]), rows: riff[:rows], wrap: "off", spellcheck: false,
+                  class: "#{field} overflow-x-auto font-mono text-base leading-snug whitespace-pre",
+                  data: {tab_target: "input", action: "input->tab#check"} %>
+            <p class="mt-1 text-muted" data-tab-target="status" aria-live="polite"></p>
+          </div>
+        <% end %>
       </div>
     </section>
   <% end %>

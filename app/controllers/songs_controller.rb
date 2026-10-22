@@ -66,7 +66,7 @@ class SongsController < ApplicationController
 
   def edit_params
     params.require(:song).permit(:title, :artist, :key, :bpm, :beats, :form, :tuning, :tone,
-      sections: [:original, :name, :chords, :energy, :groove, :guitar, :swing, :fill, :tab])
+      sections: [:original, :name, :chords, :energy, :groove, :guitar, :swing, :fill, :riff_guitar, :tab, :riff_bass, :bass_tab])
   end
 
   # A song that is playing hears the change from its next part on, as long

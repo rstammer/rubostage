@@ -40,6 +40,22 @@ RSpec.describe RiffTrack do
 
   it "drops blank tabs when it is stored" do
     track = described_class.from_h({"tone" => "clean", "tabs" => {"Verse" => verse_tab, "Chorus" => ""}})
-    expect(track.to_h).to eq({"tuning" => "standard", "tone" => "clean", "tabs" => {"Verse" => verse_tab}})
+    expect(track.to_h).to eq({"tuning" => "standard", "tone" => "clean", "tabs" => {"Verse" => verse_tab}, "bass_tabs" => {}})
+  end
+
+  describe "bass riffs" do
+    let(:bass_tab) { "G|----------------|\nD|----------------|\nA|--------2-------|\nE|0-------------3-|\n" }
+
+    it "keeps them next to the guitar's" do
+      track = described_class.from_h("bass_tabs" => {"Verse" => bass_tab, "Chorus" => " "})
+      expect(track.to_h["bass_tabs"]).to eq("Verse" => bass_tab)
+      expect(track.bass_tab("Verse").notes.first[1]).to eq(28)
+      expect(track).not_to be_empty
+    end
+
+    it "names the section and the bass when a bass tab does not read" do
+      track = described_class.from_h("bass_tabs" => {"Verse" => "G|--|\n"})
+      expect { track.validate! }.to raise_error(Tab::Invalid, /Verse \(Bass\)/)
+    end
   end
 end
