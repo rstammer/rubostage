@@ -58,6 +58,13 @@ wie an einem Amp für Sonic Pi (aus / blinkt beim Hochfahren / an, mit
 Start-Knopf), Song (letzte Takt-Meldung jünger als 3 s) und KI (Job läuft).
 Ein Turbo-Frame, der sich per `poll`-Controller alle 2 s neu holt.
 
+Darunter, sobald ein Song gestartet wurde, die **Transportleiste** als eigener
+Streifen (`.transport-bar`, Pedalboard-schwarz, Frame `transport`): Spielen,
+Stopp, Nochmal, Weiter, Schluss, Endlos für `NowPlaying.started_song_id` —
+bleibt nach Stopp stehen, auf jeder Seite. Knöpfe antworten im Frame; Spielen/
+Stopp leiten bei `Turbo-Frame: transport` auf `transport_path` um, denn Frame-
+Requests bekommen kein Layout und die Leiste wäre sonst leer.
+
 `examples/starlight/` ist die handgeschriebene Vorlage, nach der `Groove`
 gebaut wurde (4-Takt-Sektionen, `get[:section]`, `:clock` zuletzt definieren).
 Kam am 2026-10-20 aus mcblinded herüber, weil es ein Muse-Cover ist.

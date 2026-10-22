@@ -1,0 +1,5 @@
+<%# The transport bar's loop switch: small, with its lamp in the button. %>
+<%= button_to song_loop_path(song, on: Player.looping ? "0" : "1"), method: :patch, form: {id: "bar_loop_switch", class: "contents"},
+      class: "panel-button flex items-center gap-2", aria: {pressed: Player.looping} do %>
+  <span class="lamp size-2.5 <%= "lamp-on" if Player.looping %>" aria-hidden="true"></span><%= transport_icon(:loop) %>Endlos
+<% end %>

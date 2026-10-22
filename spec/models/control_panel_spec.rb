@@ -4,7 +4,7 @@ RSpec.describe ControlPanel do
   let(:panel) { described_class.new }
 
   before { allow(SonicPiApp).to receive(:state).and_return(:ready) }
-  after { NowPlaying.current_song_id = NowPlaying.last_step_at = nil }
+  after { NowPlaying.current_song_id = NowPlaying.last_step_at = NowPlaying.started_song_id = nil }
 
   it "passes on the state of Sonic Pi" do
     expect(panel.sonic_pi).to eq(:ready)
@@ -49,6 +49,25 @@ RSpec.describe ControlPanel do
     it "is off when nothing is being written" do
       create(:song, :ready)
       expect(panel).not_to be_thinking
+    end
+  end
+
+  describe "#started" do
+    let(:song) { create(:song, :ready) }
+
+    it "is the song last started, also after it stopped, so it can start again" do
+      NowPlaying.started_song_id = song.id
+      expect(panel.started).to eq(song)
+    end
+
+    it "is nothing while Sonic Pi is not there to play it" do
+      NowPlaying.started_song_id = song.id
+      allow(SonicPiApp).to receive(:state).and_return(:off)
+      expect(panel.started).to be_nil
+    end
+
+    it "is nothing before a song was started" do
+      expect(panel.started).to be_nil
     end
   end
 end

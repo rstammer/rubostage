@@ -1,0 +1,30 @@
+<%# The last song started stays at hand on every page, as a strip of its own
+    under the control bar. Its buttons answer inside this frame, so the page
+    being looked at stays where it is; like the lamps, it asks again every
+    couple of seconds. %>
+<%= turbo_frame_tag "transport" do %>
+  <div data-controller="poll" data-poll-url-value="<%= transport_path %>">
+    <% if (started = panel.started) %>
+      <div id="transport_bar" class="transport-bar">
+        <div class="mx-auto flex max-w-6xl items-center gap-3 overflow-x-auto px-4 py-2 whitespace-nowrap sm:px-8">
+          <span class="lamp shrink-0 <%= "lamp-on" if panel.song == started %>" aria-hidden="true"></span>
+          <%= link_to started.display_title, song_path(started), data: {turbo_frame: "_top"},
+                class: "mr-3 max-w-64 shrink-0 truncate font-display text-xl hover:underline" %>
+          <%= button_to song_playback_path(started), form: {class: "shrink-0"}, class: "panel-button flex items-center gap-2" do %>
+            <%= transport_icon(:play) %>Spielen
+          <% end %>
+          <%= button_to playback_path, method: :delete, form: {class: "shrink-0"}, class: "panel-button flex items-center gap-2" do %>
+            <%= transport_icon(:stop) %>Stopp
+          <% end %>
+          <% {repeat: "Nochmal", next: "Weiter", end: "Schluss"}.each do |kind, text| %>
+            <%= button_to song_command_path(started, kind: kind), form: {class: "shrink-0"}, class: "panel-button flex items-center gap-2" do %>
+              <%= transport_icon(kind) %><%= text %>
+            <% end %>
+          <% end %>
+          <%= render "controls/loop_switch", song: started %>
+          <span id="bar_queued" class="panel-label ml-2 opacity-80" aria-live="polite"></span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

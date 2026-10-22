@@ -6,10 +6,12 @@ class NowPlaying
 
   attr_reader :song, :index
 
-  # The song Sonic Pi last reported a step for. Lives in the server process,
-  # where the listener runs and jobs run inline.
+  # The song Sonic Pi last reported a step for, and the song last started
+  # from the app, which the transport bar keeps at hand even after it
+  # stopped. Live in the server process, where the listener runs and jobs
+  # run inline.
   class << self
-    attr_accessor :current_song_id, :last_step_at
+    attr_accessor :current_song_id, :last_step_at, :started_song_id
   end
 
   def self.broadcast(song, index)

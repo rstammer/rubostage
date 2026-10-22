@@ -24,6 +24,7 @@ class GenerateSongJob < ApplicationJob
   # can be started from the page.
   def play(song)
     Player.play(song.playable_code)
+    NowPlaying.started_song_id = song.id
   rescue Player::NotRunning
     nil
   end

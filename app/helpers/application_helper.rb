@@ -10,6 +10,11 @@ module ApplicationHelper
     loop: '<path d="M7 8a4 4 0 1 0 0 8c2.2 0 3.4-1.8 5-4s2.8-4 5-4a4 4 0 1 1 0 8c-2.2 0-3.4-1.8-5-4s-2.8-4-5-4z" fill="none" stroke="currentColor" stroke-width="2.4"/>'
   }.freeze
 
+  # The same symbols, small, for the buttons in the transport bar.
+  def transport_icon(icon)
+    tag.svg(FOOTSWITCH_ICONS.fetch(icon).html_safe, viewBox: "0 0 24 24", class: "size-3.5", fill: "currentColor", aria: {hidden: true})
+  end
+
   def footswitch_cap(icon)
     tag.span(class: "footswitch-cap", aria: {hidden: true}) do
       tag.svg(FOOTSWITCH_ICONS.fetch(icon).html_safe, viewBox: "0 0 24 24", class: "size-6", fill: "currentColor")

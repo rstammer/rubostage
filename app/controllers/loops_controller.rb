@@ -1,8 +1,12 @@
-# The "Endlos" footswitch: latches the loop on or off, also while a song plays.
+# The "Endlos" footswitch, on the song's page and in the transport bar:
+# latches the loop on or off, also while a song plays.
 class LoopsController < ApplicationController
   def update
     @song = Song.find(params[:song_id])
     Player.loop(params[:on] == "1")
-    render turbo_stream: turbo_stream.replace("loop_switch", partial: "songs/loop_switch", locals: {song: @song})
+    render turbo_stream: [
+      turbo_stream.replace("loop_switch", partial: "songs/loop_switch", locals: {song: @song}),
+      turbo_stream.replace("bar_loop_switch", partial: "controls/loop_switch", locals: {song: @song})
+    ]
   end
 end

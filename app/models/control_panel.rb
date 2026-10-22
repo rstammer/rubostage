@@ -18,6 +18,14 @@ class ControlPanel
     Song.find_by(id: NowPlaying.current_song_id)
   end
 
+  # The song the transport bar steers: the last one started, for as long as
+  # Sonic Pi is there to play it.
+  def started
+    return unless NowPlaying.started_song_id && sonic_pi == :ready
+
+    Song.find_by(id: NowPlaying.started_song_id)
+  end
+
   def thinking?
     Song.where(updated_at: JOB_TIMEOUT.ago..)
       .where(status: "pending").or(Song.where(updated_at: JOB_TIMEOUT.ago.., arrangement_status: "pending"))

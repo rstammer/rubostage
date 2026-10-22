@@ -16,6 +16,7 @@
   </head>
 
   <body class="min-h-screen" data-controller="theme">
+    <header class="sticky top-0 z-40">
     <nav class="control-bar" aria-label="Kontrollleiste">
       <div class="mx-auto flex max-w-6xl items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-8">
         <%= link_to root_path, class: "flex shrink-0 items-center gap-3" do %>
@@ -34,6 +35,8 @@
         </button>
       </div>
     </nav>
+    <%= render "controls/transport", panel: ControlPanel.new %>
+    </header>
 
     <main class="mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16">
       <% if flash[:notice] %>

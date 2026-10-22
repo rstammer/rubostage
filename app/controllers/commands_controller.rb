@@ -34,7 +34,8 @@ class CommandsController < ApplicationController
     end
   end
 
+  # On the song's page and in the transport bar, whichever is there.
   def render_queued(note)
-    render turbo_stream: turbo_stream.update("queued", note)
+    render turbo_stream: [turbo_stream.update("queued", note), turbo_stream.update("bar_queued", note)]
   end
 end
