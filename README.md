@@ -7,11 +7,12 @@
 <p align="center">
   <strong>Name a song. Get a band.</strong><br>
   A play-along machine for busking: someone shouts a request, rubostage writes the chart,<br>
-  Sonic Pi plays drums, bass and keys, and you sing and play guitar on top.
+  Sonic Pi plays drums, bass and keys, and you sing and play guitar on top.<br>
+  Or write your own song and let it build the band around it.
 </p>
 
 <p align="center">
-  <img src="docs/song-blonde.jpg" alt="A song in rubostage: title, key and tempo, the grille panel where the current chord appears, footswitches, and the song form" width="820">
+  <img src="docs/song-blonde.jpg" alt="A song playing in rubostage: the lyrics on the left, the current chord big in the grille panel, the footswitches below, and the transport bar under the control bar" width="820">
 </p>
 
 ---
@@ -24,7 +25,9 @@ the chart comes from an AI, the music comes from [Sonic Pi](https://sonic-pi.net
 and the lead sheet follows along chord by chord, so your hands can stay on the
 guitar.
 
-It shows **form and chords only**. Lyrics and melody are yours.
+The AI writes **form and chords only**, never lyrics or melody. Those are
+yours: paste your words into a song and they sit beside the chart while you
+play.
 
 ## What it does
 
@@ -34,22 +37,52 @@ It shows **form and chords only**. Lyrics and melody are yours.
   arrangement: drum style, bass, keys, guitar part, energy per section. It is
   swapped in *while the song plays*, at the next section boundary, without
   losing your place in the form.
+- **Write your own.** Start a song from scratch in the editor: key, tempo,
+  bar length, sections and chords. Press *Arrangieren lassen* and the AI
+  builds the band around it. Any song can be arranged again, with a wish like
+  "quieter, reggae in the chorus".
 - **A lead sheet that follows.** Sonic Pi reports every chord change. The page
   shows the current chord big, the next one small, and marks the part of the
-  form you are in.
+  form you are in. Your lyrics stay in view in a column on the left.
 - **Steer it while you play.** Repeat the part, skip to the next, jump
-  anywhere in the form, or play the ending. Every command lands cleanly at a
-  section boundary. For now that means keys; a MIDI foot controller is planned.
-- **Write your own.** Start a song from scratch in the editor, just key, tempo,
-  sections and chords, and let the AI arrange the band on demand. Any song can
-  be arranged again, with a wish like "quieter, reggae in the chorus".
+  anywhere in the form, play the ending, or loop the whole form endlessly.
+  Every command lands cleanly at a section boundary, and the transport bar
+  keeps the footswitches at hand on every page.
 - **Fix what the AI got wrong.** Edit title, key, tempo, form, chords, and per
-  section the groove, energy, swing and guitar style. Add riffs as plain ASCII
-  guitar tabs. Saving while the song plays updates it in place.
+  section the groove, energy, swing and guitar style. Add guitar and bass
+  riffs as plain ASCII tabs. Saving while the song plays updates it in place.
 - **Works offline.** Every song you have made plays again without a network.
-  Only new requests need the AI.
+  Only new requests and arrangements need the AI.
 - **Take it home.** Every song lands in a songs folder of your choice as a
-  standalone Sonic Pi file plus notes, so it lives on without the app.
+  standalone Sonic Pi file plus notes. Record any song to a WAV and download it.
+
+## Your repertoire
+
+The start page is your repertoire: a compact wish field on top, every song
+below, wished for or written by hand. *+ Neuer Song* opens an empty editor.
+
+<p align="center">
+  <img src="docs/repertoire.jpg" alt="The repertoire: the wish field on top, then the list of songs with key, tempo and an edit button, a hand-written song among the covers" width="820">
+</p>
+
+The editor is the heart of rubostage. A song is a skeleton (key, tempo, bar
+length, sections, chords, form) plus, optionally, an arrangement. Whether the
+AI wrote the skeleton or you did makes no difference from there on.
+
+<p align="center">
+  <img src="docs/editor.jpg" alt="The editor: a section with its chords, how the band plays it, and a guitar riff as tab, ticked on next to an unticked bass riff" width="820">
+</p>
+
+Chords are written the way a chart writes them:
+
+```
+Am | % | F | C G
+```
+
+`|` separates bars, two chords in a bar share it, and an empty bar or `%`
+holds the chord before it. A song's bars are **4/4** or **2/4**: in 2/4 the
+chords change every two beats while the band keeps playing its patterns in
+fours, so a slow song can change chords often without sounding rushed.
 
 ## The control bar
 
@@ -64,8 +97,16 @@ Across the top sits an amp's control plate with three pilot lamps:
 The switch on the right flips between the two amps the design is modelled on:
 **Blonde** (light) and **Blackface** (dark).
 
+Once a song has been started, a second bar appears below, black like a
+pedalboard: the **transport bar** with *Spielen*, *Stopp*, *Nochmal*,
+*Weiter*, *Schluss* and *Endlos* for that song. It stays on every page, also
+after the song stopped, so you can look at another song or edit one while
+the band keeps playing, and start it again from anywhere. *Endlos* latches
+like an amp switch: while it is on, the form starts again from the top
+instead of ending.
+
 <p align="center">
-  <img src="docs/song-blackface.jpg" alt="The same song page in the dark Blackface theme" width="820">
+  <img src="docs/song-blackface.jpg" alt="The same song playing, in the dark Blackface theme" width="820">
 </p>
 
 ## How it works
@@ -153,8 +194,8 @@ is not running yet.
 
 ## Keyboard
 
-The page listens to the keyboard, so you never have to let go of the guitar
-for long.
+The song's page listens to the keyboard, so you never have to let go of the
+guitar for long.
 
 | Key | Action |
 |-----|--------|
@@ -163,6 +204,7 @@ for long.
 | <kbd>R</kbd> | repeat the current part |
 | <kbd>N</kbd> / <kbd>→</kbd> | next part |
 | <kbd>E</kbd> | play the ending |
+| <kbd>L</kbd> | loop the form on or off |
 | <kbd>1</kbd>–<kbd>9</kbd> | jump to that part of the form |
 
 ### MIDI foot controller (planned)
@@ -175,8 +217,9 @@ keys, but that has not been tried either.
 
 ## Riffs as tabs
 
-In the editor every section can carry a riff, written the way guitarists write
-them anyway:
+In the editor every section can carry a guitar riff, a bass riff, or both.
+Tick *Gitarre* or *Bass* and the box fills with the strings and an empty bar,
+ready for frets, written the way guitarists write them anyway:
 
 ```
 e|----------------|----------------|
@@ -187,9 +230,19 @@ A|--7--7-10-7-5-3-|-2--------------|
 E|----------------|----------------|
 ```
 
+A bass tab has four strings:
+
+```
+G|----------------|
+D|----------------|
+A|0-------0---3---|
+E|--------------1-|
+```
+
 One character is a sixteenth, 16 per bar. `x` is a dead note, `-` lets it ring.
-Tunings: standard, drop D, half a step down and D standard. Riffs repeat until
-their section ends.
+Tunings: standard, drop D, half a step down and D standard; the bass follows
+the guitar's lowest four strings an octave down. Riffs repeat until their
+section ends. Where the bass plays a riff, the arranged bass line rests.
 
 ## The songs folder
 
@@ -210,6 +263,17 @@ touched again.
 A song keeps its Sonic Pi code: it sounds the way it did when last saved or
 arranged, even after the groove engine has changed. **Code neu bauen** on the
 song's page brings it up to date.
+
+Lyrics stay in the app: they are not written to the songs folder and never
+sent to the AI.
+
+## Recording a WAV
+
+*WAV aufnehmen* on a song's page plays it once through, with the loop off,
+and records what Sonic Pi sounds. Sonic Pi cannot render faster than it
+plays, so a three-minute song takes three minutes and you hear it while it
+records. The take is then offered as a download, named after the song, and
+kept out of git under `storage/recordings/`.
 
 ## Playing without the app
 
@@ -256,6 +320,9 @@ bin/rails zeitwerk:check
 Specs cover everything that is plain Ruby: lead sheets, arrangements, grooves,
 tabs, the editor, export, the OSC client. Sound is checked by ear, and by
 recording takes with `bin/play --record`.
+
+The screenshots in `docs/` come from a demo instance with its own database,
+and the lyrics in them are made up for the purpose.
 
 ## Origin
 
