@@ -66,4 +66,33 @@ RSpec.describe SongSheet do
     sheet = described_class.from_h(data)
     expect(described_class.from_h(sheet.to_h).to_h).to eq(sheet.to_h)
   end
+
+  describe "an empty bar" do
+    def verse(bars)
+      described_class.from_h(data.merge("sections" => [{"name" => "Verse", "bars" => bars}], "form" => ["Verse"])).sections.first
+    end
+
+    it "holds the chord before it for another bar" do
+      section = verse([["Am"], [], ["F", "G"]])
+      expect(section.steps.map { |chord, beats| [chord.to_s, beats] }).to eq([["Am", 8], ["F", 2], ["G", 2]])
+    end
+
+    it "is also written as %" do
+      expect(verse([["Am"], ["%"], ["F"]]).bars.map(&:size)).to eq([1, 0, 1])
+    end
+
+    it "holds the second half of a split bar" do
+      expect(verse([["Am", "G"], []]).steps.map(&:last)).to eq([2, 6])
+    end
+
+    it "cannot open a section, there is nothing to hold" do
+      expect { verse([[], ["Am"]]) }.to raise_error(SongSheet::Invalid, /Verse/)
+    end
+
+    it "shows as % in the chart and keeps its place through a hash" do
+      section = verse([["Am"], [], ["F"]])
+      expect(section.chart).to eq("Am | % | F")
+      expect(section.to_h["bars"]).to eq([["Am"], [], ["F"]])
+    end
+  end
 end

@@ -74,7 +74,7 @@
           <%= label_tag id.call(:chords), "Akkorde", class: label %>
           <%= text_area_tag name.call(:chords), row.chords, id: id.call(:chords), rows: 2, class: field,
                 placeholder: "Am | F | C G | G" %>
-          <p class="mt-1 text-muted">Takte mit <code>|</code> oder Zeilenumbruch, zwei Akkorde in einem Takt mit Leerzeichen.</p>
+          <p class="mt-1 text-muted">Takte mit <code>|</code> oder Zeilenumbruch, zwei Akkorde in einem Takt mit Leerzeichen. Ein leerer Takt oder <code>%</code> lässt den Akkord davor weiterklingen.</p>
         </div>
       </div>
 

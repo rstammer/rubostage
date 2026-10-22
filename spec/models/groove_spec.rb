@@ -15,6 +15,11 @@ RSpec.describe Groove do
   let(:groove) { described_class.new(sheet, song_id: 7, osc_port: 4570) }
   let(:code) { groove.code }
 
+  it "plays a held bar as the chord before it, twice as long" do
+    held = SongSheet.from_h(sheet.to_h.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["E"]]}], "form" => ["Verse"]))
+    expect(described_class.new(held).timeline.map { |step| [step[:chord], step[:beats]] }).to eq([["B", 8], ["E", 4]])
+  end
+
   it "sets the tempo above the loops" do
     expect(code.index("use_bpm 122")).to be < code.index("live_loop :")
   end

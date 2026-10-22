@@ -58,6 +58,17 @@ RSpec.describe SongEditor do
       expect(song.reload.sheet["sections"].first["bars"]).to eq([["B"], ["C#m"], ["G#m", "E"], ["E"]])
     end
 
+    it "reads an empty bar or a % as the chord before it, held" do
+      rows = {"0" => {"original" => "Verse", "name" => "Verse", "chords" => "| B | | C#m | % |\nE"}}
+      described_class.new(song, params(sections: rows)).save
+      expect(song.reload.sheet["sections"].first["bars"]).to eq([["B"], [], ["C#m"], [], ["E"]])
+    end
+
+    it "shows a held bar as %" do
+      song.update!(sheet: song.sheet.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["E"]]}]))
+      expect(described_class.for(song).rows.first.chords).to eq("B | % | E")
+    end
+
     it "adds a section from the empty row and takes the form as a list" do
       rows = {
         "0" => {"original" => "Verse", "name" => "Verse", "chords" => "B | E"},

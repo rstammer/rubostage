@@ -99,6 +99,9 @@
           <% position = 0 %>
           <% section.bars.each do |bar| %>
             <div class="flex min-w-0 flex-wrap items-baseline gap-x-2 border-r-2 border-ink/25 px-2 py-3 font-display text-3xl sm:px-3 xl:text-4xl">
+              <% if bar.empty? %>
+                <span class="text-muted" title="Akkord davor klingt weiter"><%= SongSheet::Section::HOLD %></span>
+              <% end %>
               <% bar.each do |chord| %>
                 <span id="chord-<%= section_index %>-<%= position %>"><%= chord %></span>
                 <% position += 1 %>

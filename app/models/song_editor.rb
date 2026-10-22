@@ -13,7 +13,7 @@ class SongEditor
       part = arrangement&.section(section.name)
       SongEditor::Row.new(
         original: section.name, name: section.name,
-        chords: section.bars.map { |bar| bar.join(" ") }.join(" | "),
+        chords: section.chart,
         energy: part&.energy, groove: part&.groove&.to_s, guitar: part&.guitar&.to_s,
         swing: part&.swing, fill: part&.fill || false, tab: riffs.tabs[section.name].to_s
       )

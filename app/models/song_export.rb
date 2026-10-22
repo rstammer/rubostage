@@ -151,7 +151,8 @@ class SongExport
 
   def chords
     rows = @sheet.sections.map do |section|
-      bars = section.bars.map { |bar| bar.join(" ") }.join(" \\| ")
+      # Escaped, or the bar lines would split the Markdown table.
+      bars = section.chart.gsub("|") { "\\|" }
       "| #{section.name} | `#{bars}` |"
     end
     <<~MD

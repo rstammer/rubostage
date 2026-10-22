@@ -67,7 +67,7 @@ class ArrangementWriter
 
   def prompt_for(sheet, wish)
     sections = sheet.sections.map do |section|
-      "  #{section.name}: #{section.bars.map { |bar| bar.join(" ") }.join(" | ")}"
+      "  #{section.name}: #{section.chart}"
     end
     song = sheet.artist.present? ? "#{sheet.title} by #{sheet.artist}" : "#{sheet.title}, the busker's own song"
     prompt = format(

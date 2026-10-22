@@ -66,4 +66,9 @@ RSpec.describe NowPlaying do
     described_class.broadcast(song, 1)
     expect(Turbo::StreamsChannel).not_to have_received(:broadcast_update_to)
   end
+
+  it "counts a held chord once, the way the groove reports it" do
+    song.update!(sheet: song.sheet.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["C#m"]]}, {"name" => "Bridge", "bars" => [["E"]]}]))
+    expect(described_class.new(song, 1).chord).to eq("C#m")
+  end
 end

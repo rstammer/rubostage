@@ -34,9 +34,13 @@ class SongEditor::Row
   def blank? = name.empty? && chords.strip.empty?
 
   # "B | C#m\nG#m E" as bars: bar lines and line breaks split bars, spaces
-  # split the chords within one.
+  # split the chords within one. An empty bar between two bar lines, or a %,
+  # holds the chord before it; bar lines at the ends of a line are only
+  # frames.
   def bars
-    chords.split(/[|\n]/).map(&:split).reject(&:empty?)
+    chords.lines.map(&:strip).reject(&:empty?).flat_map do |line|
+      line.delete_prefix("|").delete_suffix("|").split("|", -1).map { |bar| bar.split - [SongSheet::Section::HOLD] }
+    end
   end
 
   # What the editor changes in this section's part of the arrangement.

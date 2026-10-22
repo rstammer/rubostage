@@ -53,6 +53,14 @@ RSpec.describe "Songs", type: :request do
       expect(response.body).to include("C#m", "122", 'id="chord-0-1"', 'id="now_playing"')
     end
 
+    it "marks a held bar with % and numbers only the chords that sound" do
+      song = create(:song, :ready)
+      song.update!(sheet: song.sheet.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["E"]]}]))
+      get song_path(song)
+      expect(response.body).to include("%", 'id="chord-0-1">E<')
+      expect(response.body).not_to include('id="chord-0-2"')
+    end
+
     it "says when the full arrangement is on its way" do
       song = create(:song, :ready, arrangement_status: "pending")
       get song_path(song)

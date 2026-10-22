@@ -393,11 +393,9 @@ class Groove
   end
 
   def section_steps(section)
-    section.bars.flat_map do |bar|
-      bar.map do |chord|
-        {section: section.name, chord: chord.to_s, bass: chord.bass_note,
-         voicing: chord.voicing, beats: 4 / bar.size}
-      end
+    section.steps.map do |chord, beats|
+      {section: section.name, chord: chord.to_s, bass: chord.bass_note,
+       voicing: chord.voicing, beats: beats}
     end
   end
 
