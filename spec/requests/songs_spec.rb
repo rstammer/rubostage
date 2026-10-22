@@ -209,4 +209,39 @@ RSpec.describe "Songs", type: :request do
       expect(response).to redirect_to(song_path(song))
     end
   end
+
+  describe "deleting" do
+    let(:song) { create(:song, :ready) }
+
+    before do
+      allow(Player).to receive(:stop)
+      NowPlaying.current_song_id = nil
+    end
+
+    it "is offered on the song, with a question first" do
+      get song_path(song)
+      expect(response.body).to include("Löschen", "data-turbo-confirm")
+    end
+
+    it "removes the song and goes back to the repertoire" do
+      delete song_path(song)
+      expect(Song.exists?(song.id)).to be(false)
+      expect(response).to redirect_to(root_path)
+      expect(Player).not_to have_received(:stop)
+    end
+
+    it "stops the song first when it is playing" do
+      NowPlaying.current_song_id = song.id
+      delete song_path(song)
+      expect(Player).to have_received(:stop)
+      expect(NowPlaying.current_song_id).to be_nil
+    end
+
+    it "deletes even when Sonic Pi is closed" do
+      NowPlaying.current_song_id = song.id
+      allow(Player).to receive(:stop).and_raise(Player::NotRunning)
+      delete song_path(song)
+      expect(Song.exists?(song.id)).to be(false)
+    end
+  end
 end

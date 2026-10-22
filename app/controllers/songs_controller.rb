@@ -43,6 +43,13 @@ class SongsController < ApplicationController
     end
   end
 
+  def destroy
+    song = Song.find(params[:id])
+    stop_if_playing(song)
+    song.destroy!
+    redirect_to root_path, notice: "#{song.display_title} ist gelöscht."
+  end
+
   private
 
   # A sheet written by hand: stored as it is, no Claude involved.
@@ -74,5 +81,14 @@ class SongsController < ApplicationController
     "Gespeichert – klingt ab dem nächsten Teil."
   rescue Player::NotRunning
     "Gespeichert."
+  end
+
+  def stop_if_playing(song)
+    return unless NowPlaying.current_song_id == song.id
+
+    NowPlaying.current_song_id = nil
+    Player.stop
+  rescue Player::NotRunning
+    nil
   end
 end

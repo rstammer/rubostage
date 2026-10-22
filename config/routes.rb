@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   root "songs#index"
 
-  resources :songs, only: [:index, :new, :create, :show, :edit, :update] do
+  resources :songs, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
     resource :playback, only: :create
     resource :command, only: :create
     resource :export, only: :create

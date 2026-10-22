@@ -12,7 +12,11 @@
   <p class="flex items-center gap-3 text-lg text-muted"><span class="lamp lamp-on" aria-hidden="true"></span>Hat nicht geklappt</p>
   <h1 class="mt-4 text-6xl leading-[0.95] sm:text-8xl"><%= @song.request %></h1>
   <p class="sheet mt-8 max-w-2xl px-5 py-4 text-lg"><%= @song.error %></p>
-  <%= link_to "Anderen Song nennen", root_path, class: "ring-button mt-8" %>
+  <div class="mt-8 flex flex-wrap gap-3">
+    <%= link_to "Anderen Song nennen", root_path, class: "ring-button" %>
+    <%= button_to "Löschen", song_path(@song), method: :delete, class: "ring-button",
+          form: {data: {turbo_confirm: "#{@song.display_title} wirklich löschen?"}} %>
+  </div>
 
 <% else %>
   <% sheet = @song.lead_sheet %>
@@ -132,6 +136,8 @@
     </p>
     <div class="flex gap-3">
       <%= link_to "Bearbeiten", edit_song_path(@song), class: "ring-button" %>
+      <%= button_to "Löschen", song_path(@song), method: :delete, class: "ring-button",
+            form: {data: {turbo_confirm: "#{@song.display_title} wirklich löschen?"}} %>
       <%= button_to "Ins Repo", song_export_path(@song), class: "ring-button",
             title: "Schreibt live.rb und NOTES.md in den Songs-Ordner der Band" %>
     </div>
