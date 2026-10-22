@@ -1,0 +1,12 @@
+<%# The lyrics, pasted in the editor, in a column of their own. On a wide
+    screen it stays in view below the bars at the top and scrolls by itself. %>
+<aside id="lyrics" class="sheet order-last p-5 sm:p-7 lg:sticky lg:top-36 lg:order-first lg:max-h-[calc(100vh-10rem)] lg:overflow-y-auto">
+  <h2 class="text-3xl">Text</h2>
+  <% if song.lyrics.present? %>
+    <div class="mt-4 text-lg leading-relaxed whitespace-pre-line"><%= song.lyrics %></div>
+  <% else %>
+    <p class="mt-3 text-muted">
+      Noch kein Songtext. Im <%= link_to "Editor", edit_song_path(song), class: "underline" %> hineinkopieren.
+    </p>
+  <% end %>
+</aside>

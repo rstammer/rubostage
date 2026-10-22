@@ -3,7 +3,7 @@
 # checked the way a fresh song is, and nothing is stored unless all of it
 # reads.
 class SongEditor
-  attr_reader :song, :title, :artist, :key, :bpm, :beats, :form, :tuning, :tone, :rows, :error
+  attr_reader :song, :title, :artist, :key, :bpm, :beats, :form, :tuning, :tone, :lyrics, :rows, :error
 
   def self.for(song)
     sheet = song.lead_sheet
@@ -21,7 +21,7 @@ class SongEditor
     end
     new(song, {
       "title" => sheet.title, "artist" => sheet.artist, "key" => sheet.key, "bpm" => sheet.bpm, "beats" => sheet.beats,
-      "form" => sheet.form.join(", "), "tuning" => riffs.tuning, "tone" => riffs.tone
+      "form" => sheet.form.join(", "), "tuning" => riffs.tuning, "tone" => riffs.tone, "lyrics" => song.lyrics
     }, rows: rows + [SongEditor::Row.blank])
   end
 
@@ -42,6 +42,7 @@ class SongEditor
     @form = params["form"].to_s
     @tuning = params["tuning"].to_s
     @tone = params["tone"].to_s
+    @lyrics = params["lyrics"].to_s
     @rows = rows || params["sections"].to_h.sort_by { |index, _| index.to_i }.map { |_, row| SongEditor::Row.from_params(row) }
   end
 
@@ -57,7 +58,8 @@ class SongEditor
     }).validate!
     song.update!(
       title: sheet.title, artist: sheet.artist, key: sheet.key, bpm: sheet.bpm, sheet: sheet.to_h,
-      arrangement: (build_arrangement(sheet).to_h if arranged?), riff_track: riffs.to_h, status: "ready"
+      arrangement: (build_arrangement(sheet).to_h if arranged?), riff_track: riffs.to_h, status: "ready",
+      lyrics: lyrics.presence
     )
     song.rebuild_code!
     @swappable = structure(sheet) == before

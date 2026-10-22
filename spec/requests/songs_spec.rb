@@ -61,6 +61,18 @@ RSpec.describe "Songs", type: :request do
       expect(response.body).not_to include('id="chord-0-2"')
     end
 
+    it "shows the lyrics in a column on the left, as written" do
+      song = create(:song, :ready, lyrics: "Far away\nThis ship is taking me")
+      get song_path(song)
+      expect(response.body).to include('id="lyrics"', "Far away\nThis ship is taking me", "whitespace-pre-line")
+    end
+
+    it "points to the editor while there are no lyrics" do
+      song = create(:song, :ready)
+      get song_path(song)
+      expect(response.body).to include('id="lyrics"', "Noch kein Songtext", edit_song_path(song))
+    end
+
     it "says when the full arrangement is on its way" do
       song = create(:song, :ready, arrangement_status: "pending")
       get song_path(song)
@@ -116,6 +128,11 @@ RSpec.describe "Songs", type: :request do
       get edit_song_path(song)
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('name="song[bpm]"', "B | C#m | G#m | E", 'name="song[sections][0][tab]"', 'name="song[sections][1][name]"')
+    end
+
+    it "has a box to paste the lyrics into" do
+      get edit_song_path(song)
+      expect(response.body).to include('name="song[lyrics]"', "Songtext")
     end
 
     it "lets the bar be four or two beats" do

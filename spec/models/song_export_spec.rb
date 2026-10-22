@@ -55,6 +55,13 @@ RSpec.describe SongExport do
     expect(dir.join("live.rb").read).to include("live_loop :bass_riff")
   end
 
+  it "leaves the lyrics out of the songs folder" do
+    song.update!(lyrics: "Far away, this ship is taking me")
+    export.call
+    expect(dir.join("NOTES.md").read).not_to include("Far away")
+    expect(dir.join("live.rb").read).not_to include("Far away")
+  end
+
   it "writes a held bar as % in the notes" do
     song.update!(sheet: song.sheet.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["E"]]}]))
     export.call

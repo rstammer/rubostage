@@ -66,6 +66,12 @@ RSpec.describe ControlPanel do
       expect(panel.started).to be_nil
     end
 
+    it "is the song that plays when the start was forgotten, e.g. after a code reload" do
+      NowPlaying.current_song_id = song.id
+      NowPlaying.last_step_at = 1.second.ago
+      expect(panel.started).to eq(song)
+    end
+
     it "is nothing before a song was started" do
       expect(panel.started).to be_nil
     end

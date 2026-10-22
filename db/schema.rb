@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_192803) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_195843) do
   create_table "settings", force: :cascade do |t|
     t.string "key", null: false
     t.string "value"
@@ -37,6 +37,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_192803) do
     t.string "origin", default: "wish", null: false
     t.string "folder"
     t.string "recording_status", default: "none", null: false
+    t.text "lyrics"
     t.index ["folder"], name: "index_songs_on_folder", unique: true
   end
 end

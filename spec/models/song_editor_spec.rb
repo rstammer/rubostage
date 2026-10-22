@@ -86,6 +86,13 @@ RSpec.describe SongEditor do
       expect(song.reload.riffs.tabs).to be_empty
     end
 
+    it "keeps the lyrics as pasted, line breaks and all" do
+      text = "First line\nsecond line\n\nChorus line"
+      described_class.new(song, params(lyrics: text)).save
+      expect(song.reload.lyrics).to eq(text)
+      expect(described_class.for(song).lyrics).to eq(text)
+    end
+
     it "shows a held bar as %" do
       song.update!(sheet: song.sheet.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["E"]]}]))
       expect(described_class.for(song).rows.first.chords).to eq("B | % | E")

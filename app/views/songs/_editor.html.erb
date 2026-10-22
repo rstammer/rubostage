@@ -61,6 +61,13 @@
     </p>
   </section>
 
+  <section class="<%= card %>">
+    <%= label_tag "song_lyrics", "Songtext", class: label %>
+    <%= text_area_tag "song[lyrics]", @editor.lyrics, id: "song_lyrics", rows: 10, class: "#{field} leading-relaxed",
+          placeholder: "Text hier hineinkopieren – Zeilen und Leerzeilen bleiben, wie sie sind." %>
+    <p class="mt-1 text-muted">Steht auf der Songseite links. Bleibt in der App: nicht im Song-Ordner, nicht bei der KI.</p>
+  </section>
+
   <% @editor.rows.each_with_index do |row, i| %>
     <% name = ->(attr) { "song[sections][#{i}][#{attr}]" } %>
     <% id = ->(attr) { "section_#{i}_#{attr}" } %>

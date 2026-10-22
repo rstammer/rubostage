@@ -19,11 +19,12 @@ class ControlPanel
   end
 
   # The song the transport bar steers: the last one started, for as long as
-  # Sonic Pi is there to play it.
+  # Sonic Pi is there to play it. The one that plays stands in when the start
+  # was forgotten, as it is when the code reloads in development.
   def started
-    return unless NowPlaying.started_song_id && sonic_pi == :ready
+    return unless sonic_pi == :ready
 
-    Song.find_by(id: NowPlaying.started_song_id)
+    NowPlaying.started_song_id ? Song.find_by(id: NowPlaying.started_song_id) : song
   end
 
   def thinking?
