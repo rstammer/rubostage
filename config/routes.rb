@@ -13,4 +13,5 @@ Rails.application.routes.draw do
   resource :playback, only: :destroy
   resource :sonic_pi, only: :create, controller: "sonic_pi"
   resource :controls, only: :show
+  resource :settings, only: [:show, :update]
 end

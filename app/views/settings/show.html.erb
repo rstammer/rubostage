@@ -1,0 +1,24 @@
+<% content_for :title, "Einstellungen – rubostage" %>
+
+<p class="text-xl text-muted">Für die ganze Bühne</p>
+<h1 class="mt-1 text-6xl leading-[0.95] sm:text-7xl">Einstellungen</h1>
+
+<% if @error %>
+  <p class="sheet mt-8 flex items-center gap-3 px-5 py-4 text-lg">
+    <span class="lamp lamp-on" aria-hidden="true"></span>Nicht gespeichert: <%= @error %>
+  </p>
+<% end %>
+
+<%= form_with url: settings_path, method: :patch, class: "sheet mt-10 p-5 sm:p-7" do %>
+  <%= label_tag "songs_root", "Song-Ordner", class: "eyebrow block" %>
+  <div class="mt-2 flex flex-wrap items-end gap-4">
+    <%= text_field_tag "songs_root", @songs_root, autocomplete: "off", spellcheck: false,
+          class: "field min-w-64 flex-1 px-3 py-2 font-mono text-lg", placeholder: "~/songs" %>
+    <button type="submit" class="ring-button button-go">Speichern</button>
+  </div>
+  <p class="mt-3 max-w-2xl text-muted">
+    Jeder Song liegt hier als eigener Ordner mit <code>live.rb</code> und <code>NOTES.md</code> und wird bei jeder
+    Änderung neu geschrieben. Versionieren machst du selbst, rubostage fasst Git nicht an.
+    Dateien, deren erste Zeile du entfernt hast, bleiben, wie sie sind.
+  </p>
+<% end %>

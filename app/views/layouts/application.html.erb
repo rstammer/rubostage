@@ -25,6 +25,7 @@
         <div class="min-w-0 flex-1">
           <%= render "controls/panel", panel: ControlPanel.new %>
         </div>
+        <%= link_to "Einstellungen", settings_path, class: "panel-button shrink-0" %>
         <button type="button" class="flex shrink-0 items-center gap-2" data-action="theme#toggle"
                 aria-label="Amp wechseln: Blonde (hell) oder Blackface (dunkel)">
           <span class="panel-label hidden sm:inline">Blonde</span>
