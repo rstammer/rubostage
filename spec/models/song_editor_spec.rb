@@ -151,4 +151,33 @@ RSpec.describe SongEditor do
       end
     end
   end
+
+  describe "a new song" do
+    let(:song) { Song.new(origin: "manual") }
+
+    it "starts empty, with a few rows for the first sections" do
+      editor = described_class.blank(song)
+      expect([editor.title, editor.key, editor.form]).to eq(["", "", ""])
+      expect(editor.rows.size).to eq(3)
+      expect(editor.rows).to all(be_blank)
+      expect(editor).not_to be_arranged
+    end
+
+    it "stores the sheet as a ready song of Robin's own" do
+      rows = {"0" => {"original" => "", "name" => "Verse", "chords" => "Am | F | C | G"},
+              "1" => {"original" => "", "name" => "", "chords" => ""}}
+      editor = described_class.new(song, params(title: "Rahmersee", artist: "", key: "Am", bpm: "96", form: "", sections: rows))
+      expect(editor.save).to be(true)
+      expect(song).to be_persisted
+      expect([song.status, song.origin, song.title]).to eq(["ready", "manual", "Rahmersee"])
+      expect(song.lead_sheet.form).to eq(["Verse"])
+    end
+
+    it "stores nothing while the sheet does not read" do
+      editor = described_class.new(song, params(bpm: "", sections: {"0" => {"original" => "", "name" => "Verse", "chords" => "Am"}}))
+      expect(editor.save).to be(false)
+      expect(editor.error).to be_present
+      expect(song).not_to be_persisted
+    end
+  end
 end

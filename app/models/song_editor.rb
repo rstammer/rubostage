@@ -24,6 +24,12 @@ class SongEditor
     }, rows: rows + [SongEditor::Row.blank])
   end
 
+  # A song Robin writes from scratch: nothing filled in but the tab settings,
+  # and a few rows to start the first sections in.
+  def self.blank(song)
+    new(song, {"tuning" => "standard", "tone" => "crunch"}, rows: Array.new(3) { SongEditor::Row.blank })
+  end
+
   def initialize(song, params, rows: nil)
     params = params.to_h.stringify_keys
     @song = song
@@ -40,12 +46,12 @@ class SongEditor
   def arranged? = song.arrangement.present?
 
   def save
-    before = structure(song.lead_sheet)
+    before = song.lead_sheet&.then { |sheet| structure(sheet) }
     sheet = build_sheet
     riffs = RiffTrack.from_h({"tuning" => tuning, "tone" => tone, "tabs" => kept_rows.to_h { |row| [row.name, row.tab] }}).validate!
     song.update!(
       title: sheet.title, artist: sheet.artist, key: sheet.key, bpm: sheet.bpm, sheet: sheet.to_h,
-      arrangement: (build_arrangement(sheet).to_h if arranged?), riff_track: riffs.to_h
+      arrangement: (build_arrangement(sheet).to_h if arranged?), riff_track: riffs.to_h, status: "ready"
     )
     @swappable = structure(sheet) == before
     true

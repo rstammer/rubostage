@@ -4,7 +4,14 @@ class SongsController < ApplicationController
     @songs = Song.newest_first
   end
 
+  def new
+    @song = Song.new(origin: "manual")
+    @editor = SongEditor.blank(@song)
+  end
+
   def create
+    return create_manual if params.dig(:song, :origin) == "manual"
+
     @song = Song.new(request: params.dig(:song, :request).to_s.strip)
     if @song.save
       GenerateSongJob.perform_later(@song)
@@ -37,6 +44,17 @@ class SongsController < ApplicationController
   end
 
   private
+
+  # Robin's own sheet: stored as it is, no Claude involved.
+  def create_manual
+    @song = Song.new(origin: "manual")
+    @editor = SongEditor.new(@song, edit_params)
+    if @editor.save
+      redirect_to @song, notice: "Gespeichert."
+    else
+      render :new, status: :unprocessable_content
+    end
+  end
 
   def edit_params
     params.require(:song).permit(:title, :artist, :key, :bpm, :form, :tuning, :tone,

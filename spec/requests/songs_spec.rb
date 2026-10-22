@@ -139,4 +139,33 @@ RSpec.describe "Songs", type: :request do
       NowPlaying.current_song_id = nil
     end
   end
+
+  describe "writing a new song" do
+    let(:new_params) do
+      {song: {origin: "manual", title: "Rahmersee", artist: "", key: "Am", bpm: "96", form: "", tuning: "standard", tone: "crunch",
+              sections: {"0" => {original: "", name: "Verse", chords: "Am | F | C | G"}}}}
+    end
+
+    it "starts from an empty editor" do
+      get new_song_path
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Neuer Song", 'name="song[sections][2][name]"', 'action="/songs"')
+    end
+
+    it "stores the sheet without asking Claude and goes to the song" do
+      expect { post songs_path, params: new_params }.to change(Song, :count).by(1)
+      song = Song.last
+      expect(song).to be_manual
+      expect(song).to be_ready
+      expect(response).to redirect_to(song_path(song))
+      expect(GenerateSongJob).not_to have_been_enqueued
+    end
+
+    it "shows what is wrong and keeps the text" do
+      post songs_path, params: new_params.deep_merge(song: {sections: {"0" => {chords: "Am | Hm"}}})
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("Am | Hm")
+      expect(Song.count).to eq(0)
+    end
+  end
 end
