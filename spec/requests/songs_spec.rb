@@ -271,4 +271,30 @@ RSpec.describe "Songs", type: :request do
       expect(response.body).not_to include("Ins Repo")
     end
   end
+
+  describe "the loop switch" do
+    let(:song) { create(:song, :ready) }
+    let(:stream) { {"Accept" => "text/vnd.turbo-stream.html"} }
+
+    before { allow(Player).to receive(:loop) { |on| Player.looping = on } }
+    after { Player.looping = false }
+
+    it "sits with the footswitches, on key L" do
+      get song_path(song)
+      expect(response.body).to include("Endlos", 'data-hotkey="l"', song_loop_path(song))
+    end
+
+    it "switches the loop on and lights its lamp" do
+      patch song_loop_path(song), params: {on: "1"}, headers: stream
+      expect(Player).to have_received(:loop).with(true)
+      expect(response.body).to include("loop_switch", "lamp-on")
+    end
+
+    it "switches it off again" do
+      Player.looping = true
+      patch song_loop_path(song), params: {on: "0"}, headers: stream
+      expect(Player).to have_received(:loop).with(false)
+      expect(response.body).not_to include("lamp-on")
+    end
+  end
 end

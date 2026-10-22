@@ -386,7 +386,7 @@ class Groove
           following = cmd[2] if cmd[1] == :jump
           following = -1 if cmd[1] == :end
         end
-        following = -1 if following >= form.length
+        following = (get[:stage_loop] ? 0 : -1) if following >= form.length
         set :stage_next, following
       end
     RUBY

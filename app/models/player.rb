@@ -4,6 +4,15 @@ module Player
 
   COMMANDS = %i[repeat next jump end].freeze
 
+  # The loop switch stays where it is put, like a latching footswitch, and
+  # lives in the server process. Sonic Pi forgets it on a restart, so every
+  # song that starts takes it along.
+  @looping = false
+
+  class << self
+    attr_accessor :looping
+  end
+
   module_function
 
   # Stops whatever runs first, so a song always starts at the top of its form
@@ -11,7 +20,16 @@ module Player
   def play(code)
     sonic_pi = server
     sonic_pi.stop
-    sonic_pi.run(code)
+    sonic_pi.run("set :stage_loop, #{Player.looping}\n#{code}")
+  end
+
+  # On: at the end of the form the conductor starts again from the top
+  # instead of the closing chord. "end" still ends the song.
+  def loop(on)
+    Player.looping = on
+    server.run("set :stage_loop, #{on}")
+  rescue NotRunning
+    nil
   end
 
   def stop

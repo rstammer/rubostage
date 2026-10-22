@@ -71,6 +71,7 @@
       <%= button_to song_command_path(@song, kind: "end"), class: "footswitch", data: {hotkey: "e"} do %>
         <%= footswitch_cap(:end) %>Schluss
       <% end %>
+      <%= render "songs/loop_switch", song: @song %>
       <p id="queued" class="self-center text-lg" aria-live="polite" data-turbo-permanent></p>
     </div>
   </section>
@@ -132,7 +133,7 @@
   <div class="mt-14 flex flex-wrap items-center justify-between gap-6 border-t-2 border-ink/20 pt-6">
     <div class="max-w-2xl text-muted">
       <p>
-        Tasten: P spielen, S stopp, R nochmal, N oder → weiter, E Schluss, 1–9 springen.
+        Tasten: P spielen, S stopp, R nochmal, N oder → weiter, E Schluss, L endlos, 1–9 springen.
         Nur Form und Akkorde – Text und Melodie kommen von dir.
       </p>
       <% export = SongExport.new(@song) %>

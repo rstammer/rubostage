@@ -1,0 +1,8 @@
+<%# Latching: the lamp shows whether the form starts again at its end. %>
+<div id="loop_switch" class="flex flex-col items-center gap-2">
+  <%= button_to song_loop_path(song, on: Player.looping ? "0" : "1"), method: :patch,
+        class: "footswitch", data: {hotkey: "l"}, aria: {pressed: Player.looping} do %>
+    <%= footswitch_cap(:loop) %>Endlos
+  <% end %>
+  <span class="lamp <%= "lamp-on" if Player.looping %>" aria-hidden="true"></span>
+</div>

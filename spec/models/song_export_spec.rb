@@ -29,6 +29,7 @@ RSpec.describe SongExport do
     expect(code).to start_with(SongExport::MARK)
     expect(code).to include("live_loop :conductor", "use_bpm 122")
     expect(code).not_to include("/stage/step")
+    expect(code).to include("set :stage_loop, true")
     expect(CodeCheck.problems(code)).to be_empty
   end
 

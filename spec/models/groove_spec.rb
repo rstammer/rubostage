@@ -56,6 +56,10 @@ RSpec.describe Groove do
     expect(code).to include("get[:stage_cmd]", ":repeat", ":jump", ":end")
   end
 
+  it "starts the form again at its end while the loop is on" do
+    expect(code).to include("following = (get[:stage_loop] ? 0 : -1) if following >= form.length")
+  end
+
   it "closes on the key's chord" do
     expect(code).to include("final = [#{ChordSymbol.parse("B").bass_note}, #{ChordSymbol.parse("B").voicing.inspect}]")
   end

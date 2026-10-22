@@ -112,6 +112,10 @@ class SongExport
       #   bin/play -e 'set :stage_cmd, [3, :next, nil]'
       #   bin/play -e 'set :stage_cmd, [4, :jump, 0]'
       #   bin/play -e 'set :stage_cmd, [5, :end, nil]'
+      #
+      # To loop the form instead of ending it:
+      #
+      #   bin/play -e 'set :stage_loop, true'
 
     RUBY
   end
