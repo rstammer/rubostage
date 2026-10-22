@@ -1,55 +1,60 @@
 <% content_for :title, "rubostage" %>
 
-<section class="grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
-  <div>
-    <h1 class="text-6xl leading-[0.95] sm:text-8xl">Was sollen wir spielen?</h1>
-    <p class="mt-6 max-w-md text-xl leading-relaxed text-muted">
-      Einen Song nennen, kurz warten, dann spielt die Band. Gesang und Gitarre kommen von dir.
-    </p>
+<%= form_with model: @song, class: "grille p-5 sm:p-7" do |f| %>
+  <%= f.label :request, "Wunsch: Song und Band", class: "text-lg opacity-80" %>
+  <div class="mt-1 flex flex-wrap items-end gap-x-6 gap-y-4">
+    <%= f.text_field :request, autocomplete: "off", autofocus: @songs.none?,
+          placeholder: "Starlight von Muse",
+          class: "min-w-0 flex-1 border-0 border-b-2 border-grille-ink/50 bg-transparent px-0 pb-2 font-display text-3xl text-grille-ink placeholder:text-grille-ink/40 focus:border-grille-ink focus:ring-0 focus:outline-none sm:text-4xl" %>
+    <button type="submit" class="footswitch footswitch-go text-grille-ink">
+      <%= footswitch_cap(:play) %>Los
+    </button>
+  </div>
+  <% if @song.errors[:request].any? %>
+    <p class="mt-4 flex items-center gap-3"><span class="lamp lamp-on" aria-hidden="true"></span>Erst einen Song nennen.</p>
+  <% end %>
+<% end %>
+
+<section class="mt-14">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-6xl leading-[0.95] sm:text-7xl">Repertoire</h1>
+      <p class="mt-2 text-lg text-muted">Gewünscht oder selbst geschrieben – spielt alles auch ohne Netz.</p>
+    </div>
+    <%= link_to "+ Neuer Song", new_song_path, class: "ring-button button-go" %>
   </div>
 
-  <div>
-    <%= form_with model: @song, class: "grille p-6 sm:p-9" do |f| %>
-      <%= f.label :request, "Song und Band", class: "text-lg opacity-80" %>
-      <%= f.text_field :request, autofocus: true, autocomplete: "off",
-            placeholder: "Starlight von Muse",
-            class: "mt-2 w-full border-0 border-b-2 border-grille-ink/50 bg-transparent px-0 pb-3 font-display text-4xl text-grille-ink placeholder:text-grille-ink/40 focus:border-grille-ink focus:ring-0 focus:outline-none sm:text-5xl" %>
-      <% if @song.errors[:request].any? %>
-        <p class="mt-4 flex items-center gap-3"><span class="lamp lamp-on" aria-hidden="true"></span>Erst einen Song nennen.</p>
-      <% end %>
-      <div class="mt-8 flex justify-end">
-        <button type="submit" class="footswitch footswitch-go text-grille-ink">
-          <%= footswitch_cap(:play) %>Los
-        </button>
-      </div>
-    <% end %>
-
-    <% if @songs.any? %>
-      <div class="sheet mt-14 px-6 py-5">
-        <h2 class="text-2xl">Schon gespielt</h2>
-        <p class="text-muted">Spielt auch ohne Netz.</p>
-        <ul class="mt-3 divide-y divide-ink/15">
-          <% @songs.each do |song| %>
-            <li>
-              <%= link_to song, class: "group flex items-baseline justify-between gap-4 py-3" do %>
-                <span class="min-w-0">
-                  <span class="font-display text-2xl group-hover:text-accent"><%= song.display_title %></span>
-                  <% if song.artist.present? %><span class="text-muted"> <%= song.artist %></span><% end %>
-                </span>
-                <span class="shrink-0 text-muted">
-                  <% if song.ready? %>
-                    <%# Keys keep their case: Gm is not GM. %>
-                    <span class="font-display text-xl text-ink"><%= song.key %></span>
-                    <span class="ml-2 font-display text-xl text-ink"><%= song.bpm %></span> <span class="silk">bpm</span>
-                  <% else %>
-                    <span class="silk"><%= song.pending? ? "wird geschrieben" : "fehlgeschlagen" %></span>
-                  <% end %>
-                </span>
+  <% if @songs.any? %>
+    <ul class="sheet mt-8 divide-y divide-ink/15 px-6 py-2">
+      <% @songs.each do |song| %>
+        <li class="flex items-center gap-4 py-3">
+          <%= link_to song, class: "group flex min-w-0 flex-1 items-baseline justify-between gap-4" do %>
+            <span class="min-w-0">
+              <span class="font-display text-2xl group-hover:text-accent"><%= song.display_title %></span>
+              <% if song.artist.present? %>
+                <span class="text-muted"> <%= song.artist %></span>
+              <% elsif song.manual? %>
+                <span class="text-muted"> eigener Song</span>
               <% end %>
-            </li>
+            </span>
+            <span class="shrink-0 text-muted">
+              <% if song.ready? %>
+                <%# Keys keep their case: Gm is not GM. %>
+                <span class="font-display text-xl text-ink"><%= song.key %></span>
+                <span class="ml-2 font-display text-xl text-ink"><%= song.bpm %></span> <span class="silk">bpm</span>
+              <% else %>
+                <span class="silk"><%= song.pending? ? "wird geschrieben" : "fehlgeschlagen" %></span>
+              <% end %>
+            </span>
           <% end %>
-        </ul>
-      </div>
-    <% end %>
-  </div>
+          <% if song.ready? %>
+            <%= link_to "✎", edit_song_path(song), class: "ring-button !px-3 !py-1 !text-base",
+                  title: "#{song.display_title} bearbeiten", aria: {label: "#{song.display_title} bearbeiten"} %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="sheet mt-8 px-6 py-5 text-lg text-muted">Noch leer. Oben einen Wunsch nennen oder einen eigenen Song schreiben.</p>
+  <% end %>
 </section>

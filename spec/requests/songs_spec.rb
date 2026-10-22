@@ -11,6 +11,18 @@ RSpec.describe "Songs", type: :request do
       expect(response.body).to include("Starlight", 'name="song[request]"')
     end
 
+    it "lists the repertoire with a way to write a new song and to edit each one" do
+      song = create(:song, :ready)
+      get root_path
+      expect(response.body).to include("Repertoire", new_song_path, edit_song_path(song))
+    end
+
+    it "marks songs written by hand" do
+      create(:song, :ready, :manual, artist: "")
+      get root_path
+      expect(response.body).to include("eigener Song")
+    end
+
     it "keeps the case of a key, so minor stays minor" do
       song = create(:song, :ready)
       song.update!(key: "Gm")
