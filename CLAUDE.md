@@ -27,8 +27,12 @@ von der KI (Wunsch, `origin: "wish"`) oder aus dem leeren Editor
 3. Sonic Pi meldet jeden Akkord per OSC an UDP 4570 (`STAGE_OSC_PORT`),
    `StepListener` schiebt es per Turbo Stream ins Lead-Sheet.
 4. Befehle (Wiederholen/Weiter/Springen/Ende) greifen an Teilgrenzen,
-   Tasten P/S/R/N/E/1–9.
+   Tasten P/S/R/N/E/1–9. **Endlos** (Taste L) ist ein rastender Schalter:
+   `set :stage_loop` im Sonic-Pi-Zustand, in der App `Player.looping`; jeder
+   Start schickt ihn mit. „Schluss“ beendet auch eine Schleife.
 5. Songs sind editierbar (`SongEditor`), Riffs als ASCII-Tab (`Tab`, `RiffTrack`).
+   Ein leerer Takt (`[]` im Sheet, `%` auf dem Chart) hält den Akkord davor;
+   alles, was Akkorde zählt, geht über `Section#steps`.
 6. **Code eingefroren:** `songs.code` wird gespielt und nur bei Änderungen
    neu gebaut (`Song#rebuild_code!`: Speichern, Arrangieren, „Code neu bauen“).
 7. Jeder Code-Bau legt den Song in den **Song-Ordner** (`Setting.songs_root`,
