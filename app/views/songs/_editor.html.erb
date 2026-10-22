@@ -19,7 +19,7 @@
       <%= label_tag "song_artist", "Band", class: label %>
       <%= text_field_tag "song[artist]", @editor.artist, id: "song_artist", class: field %>
     </div>
-    <div class="grid grid-cols-2 gap-5">
+    <div class="grid grid-cols-3 gap-5">
       <div>
         <%= label_tag "song_key", "Tonart", class: label %>
         <%= text_field_tag "song[key]", @editor.key, id: "song_key", class: field %>
@@ -27,6 +27,11 @@
       <div>
         <%= label_tag "song_bpm", "BPM", class: label %>
         <%= number_field_tag "song[bpm]", @editor.bpm, id: "song_bpm", min: SongSheet::BPM_RANGE.min, max: SongSheet::BPM_RANGE.max, class: field %>
+      </div>
+      <div>
+        <%= label_tag "song_beats", "Takt", class: label %>
+        <%= select_tag "song[beats]", options_for_select({"4/4" => 4, "2/4" => 2}, @editor.beats), id: "song_beats", class: field,
+              title: "2/4: Die Akkorde wechseln alle zwei Schläge, die Band spielt ruhig im Vierertakt weiter." %>
       </div>
     </div>
     <div>

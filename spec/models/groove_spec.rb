@@ -20,6 +20,13 @@ RSpec.describe Groove do
     expect(described_class.new(held).timeline.map { |step| [step[:chord], step[:beats]] }).to eq([["B", 8], ["E", 4]])
   end
 
+  it "plays two-beat bars as half as long, with the patterns running on" do
+    half = SongSheet.from_h(sheet.to_h.merge("beats" => 2, "sections" => [{"name" => "Verse", "bars" => [["C"], ["Am"], ["Em"], []]}], "form" => ["Verse"]))
+    code = described_class.new(half).code
+    expect(described_class.new(half).timeline.map { |step| step[:beats] }).to eq([2, 2, 4])
+    expect(CodeCheck.problems(code)).to be_empty
+  end
+
   it "sets the tempo above the loops" do
     expect(code.index("use_bpm 122")).to be < code.index("live_loop :")
   end

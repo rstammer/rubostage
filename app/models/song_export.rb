@@ -145,6 +145,7 @@ class SongExport
 
       - **Tonart:** #{@sheet.key}
       - **Tempo:** #{@sheet.bpm} BPM
+      - **Takt:** #{@sheet.beats}/4
       - **Form:** #{@sheet.form.join(" – ")}
     MD
   end

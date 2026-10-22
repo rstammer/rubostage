@@ -3,7 +3,7 @@
 # checked the way a fresh song is, and nothing is stored unless all of it
 # reads.
 class SongEditor
-  attr_reader :song, :title, :artist, :key, :bpm, :form, :tuning, :tone, :rows, :error
+  attr_reader :song, :title, :artist, :key, :bpm, :beats, :form, :tuning, :tone, :rows, :error
 
   def self.for(song)
     sheet = song.lead_sheet
@@ -19,7 +19,7 @@ class SongEditor
       )
     end
     new(song, {
-      "title" => sheet.title, "artist" => sheet.artist, "key" => sheet.key, "bpm" => sheet.bpm,
+      "title" => sheet.title, "artist" => sheet.artist, "key" => sheet.key, "bpm" => sheet.bpm, "beats" => sheet.beats,
       "form" => sheet.form.join(", "), "tuning" => riffs.tuning, "tone" => riffs.tone
     }, rows: rows + [SongEditor::Row.blank])
   end
@@ -37,6 +37,7 @@ class SongEditor
     @artist = params["artist"].to_s.strip
     @key = params["key"].to_s.strip
     @bpm = params["bpm"]
+    @beats = Integer(params["beats"].presence || 4, exception: false)
     @form = params["form"].to_s
     @tuning = params["tuning"].to_s
     @tone = params["tone"].to_s
@@ -71,7 +72,7 @@ class SongEditor
 
   def build_sheet
     SongSheet.from_h(
-      "title" => title, "artist" => artist, "key" => key, "bpm" => Integer(bpm.to_s, exception: false),
+      "title" => title, "artist" => artist, "key" => key, "bpm" => Integer(bpm.to_s, exception: false), "beats" => beats,
       "sections" => kept_rows.map { |row| {"name" => row.name, "bars" => row.bars} },
       "form" => form.split(",").map(&:strip).reject(&:empty?)
     )
@@ -84,6 +85,6 @@ class SongEditor
   end
 
   def structure(sheet)
-    [sheet.bpm, sheet.played_sections.map { |section| section.bars.size }]
+    [sheet.bpm, sheet.beats, sheet.played_sections.map { |section| section.bars.size }]
   end
 end

@@ -53,4 +53,10 @@ RSpec.describe ArrangementWriter do
     expect(client.prompt).to include("Rahmersee, the busker's own song")
     expect(client.prompt).not_to include(" by ,")
   end
+
+  it "tells how long a bar is when it is not four beats" do
+    half = SongSheet.from_h(sheet.to_h.merge("beats" => 2))
+    described_class.new(client: client).call(half)
+    expect(client.prompt).to include("2 beats per entry", "run on across")
+  end
 end

@@ -5,8 +5,11 @@ class SongSheet
   class Invalid < StandardError; end
 
   BPM_RANGE = (40..240)
+  # Beats in a bar of the chart. With two, the chords change every half bar
+  # while the band's patterns keep running in bars of four.
+  BEATS = [4, 2].freeze
 
-  attr_reader :title, :artist, :key, :bpm, :sections, :form
+  attr_reader :title, :artist, :key, :bpm, :beats, :sections, :form
 
   # Reads the sheet out of an answer that may wrap the JSON in prose or a
   # code fence.
@@ -27,15 +30,16 @@ class SongSheet
     form = sections.map(&:name) if form.empty?
     new(
       title: data["title"].to_s, artist: data["artist"].to_s, key: data["key"].to_s,
-      bpm: data["bpm"], sections: sections, form: form
+      bpm: data["bpm"], beats: data.fetch("beats", 4), sections: sections, form: form
     )
   end
 
-  def initialize(title:, artist:, key:, bpm:, sections:, form:)
+  def initialize(title:, artist:, key:, bpm:, sections:, form:, beats: 4)
     @title = title
     @artist = artist
     @key = key
     @bpm = bpm
+    @beats = beats
     @sections = sections
     @form = form
     validate!
@@ -51,7 +55,7 @@ class SongSheet
 
   def to_h
     {
-      "title" => title, "artist" => artist, "key" => key, "bpm" => bpm,
+      "title" => title, "artist" => artist, "key" => key, "bpm" => bpm, "beats" => beats,
       "sections" => sections.map(&:to_h), "form" => form
     }
   end
@@ -60,6 +64,7 @@ class SongSheet
 
   def validate!
     raise Invalid, "bpm must be a whole number in #{BPM_RANGE}" unless bpm.is_a?(Integer) && BPM_RANGE.cover?(bpm)
+    raise Invalid, "beats per bar must be one of #{BEATS.join(", ")}" unless BEATS.include?(beats)
     raise Invalid, "no sections" if sections.empty?
 
     missing = form.reject { |name| section(name) }

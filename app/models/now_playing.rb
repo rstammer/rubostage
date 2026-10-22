@@ -65,7 +65,7 @@ class NowPlaying
       sheet = song.lead_sheet
       sheet.played_sections.each_with_index.flat_map do |section, form_position|
         section_index = sheet.sections.index(section)
-        section.steps.map(&:first).each_with_index.map do |chord, i|
+        section.steps(sheet.beats).map(&:first).each_with_index.map do |chord, i|
           Step.new(section.name, section_index, form_position, i, chord.to_s)
         end
       end

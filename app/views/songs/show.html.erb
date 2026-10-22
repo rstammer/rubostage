@@ -36,6 +36,10 @@
         <dd class="font-display text-4xl"><%= sheet.bpm %> <span class="font-sans text-lg font-normal">bpm</span></dd>
       </div>
       <div>
+        <dt class="silk text-muted">Takt</dt>
+        <dd class="font-display text-4xl"><%= sheet.beats %>/4</dd>
+      </div>
+      <div>
         <dt class="silk text-muted">Sound</dt>
         <dd class="mt-2 flex items-center gap-2 text-lg">
           <span class="lamp <%= {"pending" => "lamp-blink", "ready" => "lamp-on"}[@song.arrangement_status] %>" aria-hidden="true"></span>

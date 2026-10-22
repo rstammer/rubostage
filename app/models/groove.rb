@@ -393,7 +393,7 @@ class Groove
   end
 
   def section_steps(section)
-    section.steps.map do |chord, beats|
+    section.steps(@sheet.beats).map do |chord, beats|
       {section: section.name, chord: chord.to_s, bass: chord.bass_note,
        voicing: chord.voicing, beats: beats}
     end

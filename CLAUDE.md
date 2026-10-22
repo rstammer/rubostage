@@ -32,7 +32,10 @@ von der KI (Wunsch, `origin: "wish"`) oder aus dem leeren Editor
    Start schickt ihn mit. „Schluss“ beendet auch eine Schleife.
 5. Songs sind editierbar (`SongEditor`), Riffs als ASCII-Tab (`Tab`, `RiffTrack`).
    Ein leerer Takt (`[]` im Sheet, `%` auf dem Chart) hält den Akkord davor;
-   alles, was Akkorde zählt, geht über `Section#steps`.
+   alles, was Akkorde zählt, geht über `Section#steps(sheet.beats)`.
+   **Takt** pro Song (`sheet["beats"]`, 4 oder 2): bestimmt nur die Akkorddauer;
+   die Rhythmusmuster laufen weiter in 16er-Zyklen (`slot % 16`). Echtes 3/4
+   bräuchte 12er-Muster — bewusst noch nicht gebaut.
 6. **Code eingefroren:** `songs.code` wird gespielt und nur bei Änderungen
    neu gebaut (`Song#rebuild_code!`: Speichern, Arrangieren, „Code neu bauen“).
 7. Jeder Code-Bau legt den Song in den **Song-Ordner** (`Setting.songs_root`,

@@ -64,6 +64,12 @@ RSpec.describe SongEditor do
       expect(song.reload.sheet["sections"].first["bars"]).to eq([["B"], [], ["C#m"], [], ["E"]])
     end
 
+    it "stores how many beats a bar has" do
+      described_class.new(song, params(beats: "2")).save
+      expect(song.reload.lead_sheet.beats).to eq(2)
+      expect(described_class.for(song).beats).to eq(2)
+    end
+
     it "shows a held bar as %" do
       song.update!(sheet: song.sheet.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["E"]]}]))
       expect(described_class.for(song).rows.first.chords).to eq("B | % | E")
@@ -189,6 +195,14 @@ RSpec.describe SongEditor do
       expect(editor.save).to be(false)
       expect(editor.error).to be_present
       expect(song).not_to be_persisted
+    end
+  end
+
+  describe "a playing song" do
+    it "cannot take a new bar length in place, the parts change length" do
+      editor = described_class.new(song, params(beats: "2"))
+      editor.save
+      expect(editor).not_to be_swappable
     end
   end
 

@@ -5,7 +5,7 @@ class ArrangementWriter
     You arrange backing tracks for a busker who plays guitar and sings along.
     The song: %<song>s, %<bpm>s BPM, key %<key>s.
 
-    Sections and their chords, one bar of 4/4 per entry:
+    Sections and their chords, %<bar>s:
     %<sections>s
 
     Write a backing arrangement that captures the song's genre, feel and
@@ -73,6 +73,9 @@ class ArrangementWriter
     prompt = format(
       PROMPT,
       song: song, bpm: sheet.bpm, key: sheet.key,
+      bar: (sheet.beats == 4) ? "one bar of 4/4 per entry" :
+        "#{sheet.beats} beats per entry (\"%\" holds the chord before); your sixteen-step " \
+        "patterns still cover four beats and run on across the chord changes",
       sections: sections.join("\n"),
       grooves: DrumGroove::NAMES.join(", "),
       guitars: Arrangement::Part::GUITARS.join(", "),

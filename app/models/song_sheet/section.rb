@@ -30,14 +30,14 @@ class SongSheet::Section
     @bars = bars
   end
 
-  # The chords as they sound, each with its beats: a split bar gives two
-  # beats to each chord, an empty bar four more to the chord before it.
-  def steps
+  # The chords as they sound, each with its beats: a split bar shares its
+  # beats between two chords, an empty bar adds a bar to the chord before it.
+  def steps(beats = 4)
     bars.each_with_object([]) do |bar, steps|
       if bar.empty?
-        steps.last[1] += 4
+        steps.last[1] += beats
       else
-        bar.each { |chord| steps << [chord, 4 / bar.size] }
+        bar.each { |chord| steps << [chord, beats / bar.size] }
       end
     end
   end

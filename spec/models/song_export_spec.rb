@@ -41,6 +41,12 @@ RSpec.describe SongExport do
     expect(notes).to include("ungeprüft")
   end
 
+  it "names a two-beat bar in the notes" do
+    song.update!(sheet: song.sheet.merge("beats" => 2))
+    export.call
+    expect(dir.join("NOTES.md").read).to include("**Takt:** 2/4")
+  end
+
   it "writes a held bar as % in the notes" do
     song.update!(sheet: song.sheet.merge("sections" => [{"name" => "Verse", "bars" => [["B"], [], ["E"]]}]))
     export.call

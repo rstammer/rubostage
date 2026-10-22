@@ -95,4 +95,25 @@ RSpec.describe SongSheet do
       expect(section.to_h["bars"]).to eq([["Am"], [], ["F"]])
     end
   end
+
+  describe "the bar" do
+    it "has four beats unless the sheet says otherwise" do
+      expect(described_class.from_h(data).beats).to eq(4)
+    end
+
+    it "can have two beats, so the chords change every half bar of the band" do
+      sheet = described_class.from_h(data.merge("beats" => 2))
+      expect(sheet.beats).to eq(2)
+      expect(sheet.to_h["beats"]).to eq(2)
+    end
+
+    it "takes no other length" do
+      expect { described_class.from_h(data.merge("beats" => 3)) }.to raise_error(SongSheet::Invalid, /beats/)
+    end
+
+    it "gives each chord its share of a two-beat bar" do
+      sheet = described_class.from_h(data.merge("beats" => 2, "sections" => [{"name" => "Verse", "bars" => [["C"], [], ["F", "G"]]}], "form" => ["Verse"]))
+      expect(sheet.sections.first.steps(sheet.beats).map(&:last)).to eq([4, 1, 1])
+    end
+  end
 end

@@ -118,6 +118,11 @@ RSpec.describe "Songs", type: :request do
       expect(response.body).to include('name="song[bpm]"', "B | C#m | G#m | E", 'name="song[sections][0][tab]"', 'name="song[sections][1][name]"')
     end
 
+    it "lets the bar be four or two beats" do
+      get edit_song_path(song)
+      expect(response.body).to include('name="song[beats]"', "2/4")
+    end
+
     it "only shows the band's parts once there is an arrangement" do
       get edit_song_path(song)
       expect(response.body).not_to include('name="song[sections][0][groove]"')
