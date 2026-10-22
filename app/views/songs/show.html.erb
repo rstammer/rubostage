@@ -137,6 +137,31 @@
     </section>
   <% end %>
 
+  <section class="sheet mt-6 flex flex-wrap items-center justify-between gap-4 p-5 sm:p-7">
+    <div>
+      <h2 class="text-3xl">Als WAV</h2>
+      <p class="text-muted">
+        <% if @song.recording_status == "pending" %>
+          <span class="lamp lamp-blink align-middle" aria-hidden="true"></span>
+          Nimmt auf … läuft einmal ganz durch, etwa <%= @song.recording_seconds.round %> Sekunden.
+        <% elsif @song.recording_status == "failed" %>
+          <span class="lamp lamp-on align-middle" aria-hidden="true"></span>
+          Aufnahme hat nicht geklappt – läuft Sonic Pi?
+        <% else %>
+          Spielt den Song einmal ohne Schleife durch und schneidet mit, etwa <%= @song.recording_seconds.round %> Sekunden.
+        <% end %>
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <% if @song.recording_status == "ready" && @song.recording_path.exist? %>
+        <%= link_to "⤓ #{@song.recording_filename}", song_recording_path(@song), class: "ring-button", data: {turbo: false} %>
+      <% end %>
+      <% unless @song.recording_status == "pending" %>
+        <%= button_to "WAV aufnehmen", song_recording_path(@song), class: "ring-button button-go" %>
+      <% end %>
+    </div>
+  </section>
+
   <div class="mt-14 flex flex-wrap items-center justify-between gap-6 border-t-2 border-ink/20 pt-6">
     <div class="max-w-2xl text-muted">
       <p>

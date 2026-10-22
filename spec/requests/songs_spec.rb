@@ -316,4 +316,46 @@ RSpec.describe "Songs", type: :request do
       expect(response.body).not_to include("lamp-on")
     end
   end
+
+  describe "recording a WAV" do
+    let(:song) { create(:song, :ready) }
+
+    after { FileUtils.rm_f(song.recording_path) }
+
+    it "offers to record" do
+      get song_path(song)
+      expect(response.body).to include("WAV aufnehmen", song_recording_path(song))
+    end
+
+    it "starts the recording and says it is on" do
+      expect { post song_recording_path(song) }.to have_enqueued_job(RecordSongJob).with(song)
+      expect(song.reload.recording_status).to eq("pending")
+      follow_redirect!
+      expect(response.body).to include("Nimmt auf")
+    end
+
+    it "hands out the take once it is there" do
+      song.recording_path.dirname.mkpath
+      song.recording_path.write("RIFF")
+      song.update!(recording_status: "ready")
+      get song_path(song)
+      expect(response.body).to include("Starlight.wav")
+      get song_recording_path(song)
+      expect(response.headers["Content-Disposition"]).to include("attachment", "Starlight.wav")
+      expect(response.body).to eq("RIFF")
+    end
+
+    it "has nothing to hand out before there is a take" do
+      get song_recording_path(song)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "goes when the song is deleted" do
+      song.recording_path.dirname.mkpath
+      song.recording_path.write("RIFF")
+      allow(Player).to receive(:stop)
+      delete song_path(song)
+      expect(song.recording_path).not_to exist
+    end
+  end
 end

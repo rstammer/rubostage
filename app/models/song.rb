@@ -62,6 +62,26 @@ class Song < ApplicationRecord
       arrangement: full_arrangement, riffs: riffs)
   end
 
+  # One take of the song as a WAV: Sonic Pi cannot render faster than it
+  # plays, so the take runs as long as the song, from the count-in to the
+  # ring of the closing chord.
+  COUNT_IN_BEATS = 4
+  RING_OUT_SECONDS = 4
+
+  def recording_seconds
+    sheet = lead_sheet
+    beats = sheet.played_sections.sum { |section| section.steps(sheet.beats).sum(&:last) }
+    (COUNT_IN_BEATS + beats) * 60.0 / sheet.bpm + RING_OUT_SECONDS
+  end
+
+  def recording_path
+    Rails.root.join("storage/recordings/song-#{id}.wav")
+  end
+
+  def recording_filename
+    "#{display_title.tr("/\\", "-")}.wav"
+  end
+
   def display_title
     title.presence || request.presence || "Neuer Song"
   end

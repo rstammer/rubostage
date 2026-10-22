@@ -55,4 +55,17 @@ RSpec.describe Player do
       expect(server).to have_received(:run).with("set :stage_loop, true\nplay 60")
     end
   end
+
+  describe "recording" do
+    before { allow(server).to receive(:record) }
+
+    it "stops what plays and records the song once through, without the loop" do
+      Player.looping = true
+      Player.record("play 60", "/tmp/take.wav", 0)
+      expect(server).to have_received(:stop).ordered
+      expect(server).to have_received(:record).with("set :stage_loop, false\nplay 60", "/tmp/take.wav").ordered
+    ensure
+      Player.looping = false
+    end
+  end
 end

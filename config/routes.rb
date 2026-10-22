@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     resource :loop, only: :update
     resource :arrangement, only: :create
     resource :code, only: :create
+    resource :recording, only: [:create, :show]
   end
   resource :playback, only: :destroy
   resource :sonic_pi, only: :create, controller: "sonic_pi"

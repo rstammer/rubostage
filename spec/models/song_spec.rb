@@ -63,4 +63,21 @@ RSpec.describe Song do
       expect(song.reload.code).to be_present
     end
   end
+
+  describe "its recording" do
+    let(:song) { create(:song, :ready) }
+
+    it "lasts the count-in, the form and a ring-out" do
+      # 4 beats in, 16 in the form, at 122 bpm, and four seconds to ring out
+      expect(song.recording_seconds).to be_within(0.01).of(20 * 60.0 / 122 + 4)
+    end
+
+    it "is named after the song" do
+      expect(song.recording_filename).to eq("Starlight.wav")
+    end
+
+    it "lies outside the songs folder and git" do
+      expect(song.recording_path.to_s).to start_with(Rails.root.join("storage/recordings").to_s)
+    end
+  end
 end

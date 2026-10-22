@@ -34,6 +34,11 @@ von der KI (Wunsch, `origin: "wish"`) oder aus dem leeren Editor
    pro Teil per Häkchen Gitarre (6 Saiten) und/oder Bass (4 Saiten, = tiefste
    vier Gitarrensaiten −12, folgt der Stimmung). Ein Bass-Riff lässt die
    Basslinie in seinem Teil pausieren (`unless bass_riffs[form[pos]]`).
+   Häkchen setzen füllt ein leeres Tab-Feld mit Saiten + leerem Takt (`reveal`).
+8. **WAV-Export** (`RecordSongJob`): spielt den Song einmal ohne Schleife in
+   Echtzeit durch und schneidet mit (Sonic Pi kann nicht schneller rendern),
+   Dauer = Einzähler + Form + 4 s Ausklang. Liegt unter
+   `storage/recordings/song-<id>.wav`, Download auf der Songseite.
    Ein leerer Takt (`[]` im Sheet, `%` auf dem Chart) hält den Akkord davor;
    alles, was Akkorde zählt, geht über `Section#steps(sheet.beats)`.
    **Takt** pro Song (`sheet["beats"]`, 4 oder 2): bestimmt nur die Akkorddauer;

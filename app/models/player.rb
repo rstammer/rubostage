@@ -32,6 +32,14 @@ module Player
     nil
   end
 
+  # Plays the song once through, with the loop off so the take ends, and
+  # saves what Sonic Pi sounded as a WAV.
+  def record(code, path, seconds)
+    sonic_pi = server
+    sonic_pi.stop
+    sonic_pi.record("set :stage_loop, false\n#{code}", path) { sleep seconds }
+  end
+
   def stop
     server.stop
   end
