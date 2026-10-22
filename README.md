@@ -289,7 +289,16 @@ bin/play --record examples/starlight/live.rb -o take.wav -t 30
 ```
 
 [`examples/starlight/`](examples/starlight) is the hand-written play-along the
-generated grooves are modelled on.
+generated grooves are modelled on. Next to it lie three songs exported from
+rubostage, each with its `live.rb` and `NOTES.md`:
+
+- [`traveller/`](examples/traveller): an own song, written in the editor, in 2/4
+- [`something_in_the_way/`](examples/something_in_the_way): Nirvana, wished for and arranged by the AI
+- [`crawling/`](examples/crawling): Linkin Park, wished for and arranged by the AI
+
+```bash
+bin/play examples/crawling/live.rb
+```
 
 ## Sonic Pi, the hard way
 
