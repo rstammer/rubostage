@@ -10,6 +10,7 @@ Rails.application.routes.draw do
     resource :arrangement, only: :create
     resource :code, only: :create
     resource :recording, only: [:create, :show]
+    resources :messages, only: :create, controller: "song_messages"
   end
   resource :playback, only: :destroy
   resource :sonic_pi, only: :create, controller: "sonic_pi"

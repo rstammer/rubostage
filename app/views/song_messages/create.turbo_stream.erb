@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "chat_form", partial: "songs/chat_form", locals: {song: @song} %>
+<% if @asked %>
+  <%= turbo_stream.update "chat_thinking" do %>
+    <p class="mt-4 flex items-center gap-3 text-lg text-muted"><span class="lamp lamp-blink" aria-hidden="true"></span>Claude überlegt</p>
+  <% end %>
+<% end %>

@@ -7,6 +7,8 @@ class Song < ApplicationRecord
   validates :status, inclusion: {in: STATUSES}
   validates :origin, inclusion: {in: ORIGINS}
 
+  has_many :messages, class_name: "SongMessage", dependent: :delete_all
+
   broadcasts_refreshes
 
   scope :newest_first, -> { order(created_at: :desc) }

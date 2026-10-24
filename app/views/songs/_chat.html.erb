@@ -1,0 +1,13 @@
+<%# The conversation about the song, beside the editor. Claude knows the
+    sheet, the arrangement and the riffs, not the lyrics, and says what to put
+    into the editor; the answers come in over the song's chat stream. %>
+<%= turbo_stream_from song, :chat %>
+<aside id="chat" data-controller="chat" class="sheet flex flex-col p-5 sm:p-7 lg:mt-10 lg:sticky lg:top-36 lg:max-h-[calc(100vh-10rem)]">
+  <h2 class="text-3xl">Mit Claude reden</h2>
+  <p class="mt-1 text-muted">Über Akkorde, Ablauf, Groove. Den Songtext bekommt Claude nicht.</p>
+  <div id="chat_messages" data-chat-target="messages" class="mt-5 min-h-0 flex-1 space-y-4 overflow-y-auto">
+    <%= render partial: "song_messages/message", collection: song.messages.order(:id), as: :message %>
+  </div>
+  <div id="chat_thinking"></div>
+  <%= render "songs/chat_form", song: song %>
+</aside>

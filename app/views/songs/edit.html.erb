@@ -3,4 +3,7 @@
 <p class="text-xl text-muted">Bearbeiten</p>
 <h1 class="mt-1 text-6xl leading-[0.95] sm:text-7xl"><%= @song.display_title %></h1>
 
-<%= render "editor" %>
+<div class="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)]">
+  <div class="min-w-0"><%= render "editor" %></div>
+  <%= render "songs/chat", song: @song %>
+</div>
