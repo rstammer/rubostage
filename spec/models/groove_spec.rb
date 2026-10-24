@@ -79,6 +79,17 @@ RSpec.describe Groove do
     end
   end
 
+  it "plays each pass on a thread of its own, so no voice is still sleeping when the next cue comes" do
+    arranged = described_class.new(sheet, arrangement: Arrangement.from_h({"sections" => {}}, sheet), riffs: RiffTrack.from_h("bass_tabs" => {"Verse" => "G|----------------|\nD|----------------|\nA|--------2-------|\nE|0-------------3-|\n"}))
+    [code, arranged.code].each do |played|
+      voices = played.scan(/^live_loop :(\w+) do\n((?:  .*\n|\n)*?)end$/).to_h
+      expect(voices.keys).to include("drums", "bass", "comp", "pad")
+      voices.except("conductor").each do |name, body|
+        expect(body).to match(/\n  in_thread do\n/), "#{name} should play its pass on a thread"
+      end
+    end
+  end
+
   it "defines the conductor last, so every voice hears its first cue" do
     expect(code.rindex("live_loop")).to eq(code.index("live_loop :conductor"))
   end
@@ -143,6 +154,18 @@ RSpec.describe Groove do
 
     it "crashes into loud sections" do
       expect(arranged.code).to include("drum_cymbal_hard")
+    end
+
+    it "counts how often a section has come round in a row, so a short one looping on is not cut up" do
+      expect(arranged.code).to include("set :stage_again, 0", "cue :section, pos, get[:stage_again]")
+      expect(arranged.code).to include("set :stage_again, (following >= 0 && form[following] == form[pos]) ? get[:stage_again] + 1 : 0")
+    end
+
+    it "crashes and fills on sixteen-beat phrases, not on every pass of a short section" do
+      expect(arranged.code).to include("into = (cued[1] || 0) * slots / 4")
+      expect(arranged.code).to include("phrase_end = slots >= 64 || (into + slots / 4) % 16 == 0")
+      expect(arranged.code).to include("drum_cymbal_hard, amp: 0.5 * level if part[:energy] > 1 && into % 16 == 0")
+      expect(arranged.code).to include("if part[:fill] && phrase_end && slot >= slots - 8")
     end
 
     it "can swap only the voices, leaving the conductor and its place in the form" do

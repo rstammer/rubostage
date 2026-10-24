@@ -96,6 +96,7 @@ class Groove
   def start_block
     <<~RUBY
       set :stage_next, 0
+      set :stage_again, 0
       set :stage_seen, (get[:stage_cmd] || [0])[0]
 
       # Four clicks lead in.
@@ -110,7 +111,19 @@ class Groove
     voices = [@arrangement ? arranged_voices : plain_voices]
     voices << riff_voice if guitar_riffs?
     voices << bass_riff_voice if bass_riffs?
-    voices.join("\n")
+    on_threads(voices.join("\n"))
+  end
+
+  # Each voice plays its pass on a thread of its own and is straight back
+  # waiting for the next cue. Played on the loop itself, the sleeps of a pass
+  # add up a hair past the conductor's (floats), the voice misses the cue and
+  # sits out a whole pass. A voice that stops only stops its thread, so the
+  # closing chord rings; the loop then waits for a cue that never comes.
+  def on_threads(code)
+    code.gsub(/^(live_loop :\w+ do\n(?:  .*\n)*?  pos = .*\n)((?:  .*\n|\n)*?)end$/) do
+      head, body = $1, $2
+      "#{head}  in_thread do\n#{body.gsub(/^(?=.)/, "  ")}  end\nend"
+    end
   end
 
   def guitar_riffs? = @riffs&.tabs&.any?
@@ -199,8 +212,11 @@ class Groove
     sounds = @arrangement.sounds
     <<~RUBY
       # Offbeat eighths (step 2 of every beat) come late by the section's swing.
+      # Crash and fill mark sixteen-beat phrases: a short section that comes
+      # round again in a row runs on through them instead of starting over.
       live_loop :drums do
-        pos = sync(:section)[0]
+        cued = sync(:section)
+        pos = cued[0]
         if pos < 0
           sample :drum_cymbal_hard, amp: 0.7
           sample :drum_heavy_kick, amp: 0.9
@@ -208,13 +224,15 @@ class Groove
         end
         part = parts[form[pos]]
         level = levels[part[:energy]]
-        sample :drum_cymbal_hard, amp: 0.5 * level if part[:energy] > 1
         slots = beats_at[form[pos]].length * 4
+        into = (cued[1] || 0) * slots / 4
+        phrase_end = slots >= 64 || (into + slots / 4) % 16 == 0
+        sample :drum_cymbal_hard, amp: 0.5 * level if part[:energy] > 1 && into % 16 == 0
         slots.times do |slot|
           step = slot % 16
           late = (step % 4 == 2) ? part[:swing] * 0.5 : 0
           time_warp late do
-            if part[:fill] && slot >= slots - 8
+            if part[:fill] && phrase_end && slot >= slots - 8
               # Tom fill over the last two beats, down the kit.
               toms = [:drum_tom_hi_hard, :drum_tom_hi_hard, :drum_tom_mid_hard, :drum_tom_mid_hard,
                 :drum_tom_lo_hard, :drum_tom_lo_hard, :drum_snare_hard, :drum_snare_hard]
@@ -428,7 +446,7 @@ class Groove
       # is already waiting on :section when the first cue fires.
       live_loop :conductor do
         pos = get[:stage_next]
-        cue :section, pos
+        cue :section, pos, get[:stage_again]
         #{report_ending}
         stop if pos < 0
         #{report_steps}
@@ -441,6 +459,7 @@ class Groove
           following = -1 if cmd[1] == :end
         end
         following = (get[:stage_loop] ? 0 : -1) if following >= form.length
+        set :stage_again, (following >= 0 && form[following] == form[pos]) ? get[:stage_again] + 1 : 0
         set :stage_next, following
       end
     RUBY
