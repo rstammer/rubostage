@@ -23,4 +23,13 @@ RSpec.describe ClaudeCli do
     cli = described_class.new(runner: runner_returning("", success: false, stderr: "not logged in"))
     expect { cli.call("Hi") }.to raise_error(ClaudeCli::Failed, /not logged in/)
   end
+
+  it "offers the tools of an MCP server, and only those" do
+    cli = described_class.new(runner: runner_returning({result: "ok", is_error: false}.to_json))
+    cli.call("Hi", mcp: {name: "rubostage", url: "http://127.0.0.1:3000/songs/1/mcp", token: "secret", tools: %w[get_song edit_band]})
+    config = JSON.parse(@command[@command.index("--mcp-config") + 1])
+    expect(config.dig("mcpServers", "rubostage")).to include("type" => "http", "url" => "http://127.0.0.1:3000/songs/1/mcp")
+    expect(config.dig("mcpServers", "rubostage", "headers", "Authorization")).to eq("Bearer secret")
+    expect(@command).to include("--strict-mcp-config", "--allowedTools", "mcp__rubostage__get_song,mcp__rubostage__edit_band")
+  end
 end

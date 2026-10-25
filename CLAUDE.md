@@ -78,6 +78,23 @@ Worum es geht, sagt `sidebar_song`: der Song der Seite, sonst der zuletzt
 gestartete. Das Chat-Formular ist `data-turbo-permanent` mit Song-Id in der
 `id` und wird per JS geleert, nicht per Stream ersetzt.
 
+**Claude ändert Songs direkt** (Chat rechts). Schichten, damit der Wechsel auf
+RubyLLM nur einen Adapter kostet:
+- `SongTools::GetSong/EditSheet/EditBand` — reines Ruby (Name, Beschreibung,
+  JSON-Schema, `call(song, args)`), kennt weder MCP noch RubyLLM. `EditSheet`
+  geht durch `SongEditor`, also dieselben Prüfungen wie im Editor.
+- `SongChange.record(song, summary) { … }` — Schnappschuss vorher, Code neu
+  bauen, `LiveSwap` (gemeinsam mit dem Editor). `undo!` nimmt die Änderung
+  und alle danach zurück. Assoziation heißt `changes_made` (`changes` ist AR).
+- `SongChat` → `client.call(prompt, toolbox:)`. Heute
+  `SongTools::ClaudeCliClient` (`claude -p --mcp-config … --strict-mcp-config
+  --allowedTools mcp__rubostage__*`, Subscription). **Wechselstelle:** ein
+  `RubyLlmClient`, der je Tool ein `RubyLLM::Tool` baut und `toolbox.run` ruft.
+- MCP-Endpunkt `POST /songs/:id/mcp` (`McpController`, `SongTools::Mcp`,
+  handgeschriebenes JSON-RPC) **muss in Puma laufen**: `NowPlaying` und der
+  `async`-Cable-Adapter leben nur im Server-Prozess. Token in `tmp/mcp_token`
+  (geteilt von Server, Jobs, Konsole), URL aus `PORT` bzw. `APP_URL`.
+
 `examples/starlight/` ist die handgeschriebene Vorlage, nach der `Groove`
 gebaut wurde (4-Takt-Sektionen, `get[:section]`, `:clock` zuletzt definieren).
 Kam am 2026-10-20 aus mcblinded herüber, weil es ein Muse-Cover ist.

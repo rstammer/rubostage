@@ -1,0 +1,15 @@
+<%# A change Claude made, in the conversation where it was asked for, with
+    the button that takes it back. %>
+<div id="<%= dom_id(change) %>" class="change-card <%= "is-undone" if change.undone? %>">
+  <span class="lamp <%= "lamp-on" unless change.undone? %>" aria-hidden="true"></span>
+  <span class="min-w-0 flex-1">
+    <span class="eyebrow block">Claude hat geändert</span>
+    <span class="<%= "line-through" if change.undone? %>"><%= change.summary %></span>
+  </span>
+  <% if change.undone? %>
+    <span class="text-sm text-muted">rückgängig</span>
+  <% else %>
+    <%= button_to "Rückgängig", undo_song_change_path(change.song, change), class: "ring-button !px-3 !py-1 !text-sm",
+          form: {data: {turbo_confirm: (change.song.changes_made.where(id: change.id..).where(undone_at: nil).count > 1 ? "Damit gehen auch die Änderungen danach zurück. Weiter?" : nil)}} %>
+  <% end %>
+</div>

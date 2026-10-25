@@ -1,7 +1,7 @@
 # Talks about a song with Claude, as a bandmate would: it knows the sheet,
-# the arrangement and the riffs, and the conversation so far. It cannot change
-# the song; it says what to put into the editor instead. The lyrics stay out,
-# as they do everywhere Claude is asked.
+# the arrangement and the riffs, and the conversation so far, and changes the
+# song with the song tools when asked. Every change can be taken back. The
+# lyrics stay out, as they do everywhere Claude is asked.
 class SongChat
   PROMPT = <<~TEXT
     You are a bandmate of a busker who plays guitar and sings along to a
@@ -9,12 +9,16 @@ class SongChat
     with them about the song: its chords, form, feel and arrangement. Answer
     in German, short and to the point, like at a rehearsal.
 
-    You cannot change the song yourself. When you suggest a change, say
-    exactly what to put into the editor: chords per section, the form, key,
-    tempo or bar, the band's parts per section, or a wish to type in for
-    "Neu arrangieren".
+    You can change the song with your tools: edit_sheet for key, tempo, bar,
+    form, chords and tabs, edit_band for the sounds and how the band plays
+    each section. When they ask for a change, make it, then say in a sentence
+    or two what you changed; give each change a short German summary. The
+    busker hears it from the next part on and can undo any change with a
+    button. When it is unclear what they want, ask before changing anything.
+    Musical calls are theirs: suggest, do not insist.
 
-    The song: %<song>s, %<bpm>s BPM, key %<key>s, %<bar>s.
+    The song as it was when the question came (get_song reads it fresh):
+    %<song>s, %<bpm>s BPM, key %<key>s, %<bar>s.
     Sections and their chords:
     %<sections>s
     Form: %<form>s
@@ -31,13 +35,13 @@ class SongChat
 
   SPEAKERS = {"user" => "Busker", "assistant" => "You"}.freeze
 
-  def initialize(song, client: ClaudeCli.new)
+  def initialize(song, client: SongTools::ClaudeCliClient.new)
     @song = song
     @client = client
   end
 
   def call
-    @client.call(prompt)
+    @client.call(prompt, toolbox: SongTools::Toolbox.new(@song))
   end
 
   private

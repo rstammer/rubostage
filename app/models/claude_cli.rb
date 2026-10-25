@@ -14,12 +14,12 @@ class ClaudeCli
     @runner = runner
   end
 
-  def call(prompt)
-    # No tools and no saved session: one question, one answer from what Claude
-    # already knows.
-    out, err, ok = @runner.call(
-      "claude", "-p", prompt, "--output-format", "json", "--tools", "", "--no-session-persistence"
-    )
+  # No built-in tools and no saved session. With an MCP server, Claude gets
+  # its tools and only those: {name:, url:, token:, tools: [names]}.
+  def call(prompt, mcp: nil)
+    command = ["claude", "-p", prompt, "--output-format", "json", "--tools", "", "--no-session-persistence"]
+    command += mcp_options(mcp) if mcp
+    out, err, ok = @runner.call(*command)
     raise Failed, "claude -p failed: #{err.presence || out}" unless ok
 
     answer = JSON.parse(out)
@@ -28,5 +28,13 @@ class ClaudeCli
     answer["result"].to_s
   rescue JSON::ParserError
     raise Failed, "claude -p gave no JSON: #{out.to_s.truncate(200)}"
+  end
+
+  private
+
+  def mcp_options(mcp)
+    server = {type: "http", url: mcp[:url], headers: {"Authorization" => "Bearer #{mcp[:token]}"}}
+    ["--mcp-config", {mcpServers: {mcp[:name] => server}}.to_json, "--strict-mcp-config",
+      "--allowedTools", mcp[:tools].map { |tool| "mcp__#{mcp[:name]}__#{tool}" }.join(",")]
   end
 end

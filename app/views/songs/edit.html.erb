@@ -1,4 +1,6 @@
 <% content_for :title, "#{@song.display_title} bearbeiten – rubostage" %>
+<%# Shows what Claude changes from the chat while the editor is open. %>
+<%= turbo_stream_from @song %>
 
 <p class="text-xl text-muted">Bearbeiten</p>
 <h1 class="mt-1 text-6xl leading-[0.95] sm:text-7xl"><%= @song.display_title %></h1>

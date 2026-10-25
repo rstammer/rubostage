@@ -8,6 +8,8 @@ class Song < ApplicationRecord
   validates :origin, inclusion: {in: ORIGINS}
 
   has_many :messages, class_name: "SongMessage", dependent: :delete_all
+  # Not `changes`, which ActiveRecord keeps for unsaved attributes.
+  has_many :changes_made, class_name: "SongChange", dependent: :delete_all
 
   broadcasts_refreshes
 

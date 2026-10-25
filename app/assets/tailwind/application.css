@@ -496,6 +496,19 @@
     }
   }
 
+  /* A change Claude made, in the chat, with its undo button. */
+  .change-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.4rem;
+    border: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent);
+    &.is-undone {
+      opacity: 0.6;
+    }
+  }
+
   /* Claude's answers, set from markdown. */
   .chat-text {
     & > * + * {

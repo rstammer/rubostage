@@ -49,7 +49,7 @@ class SongEditor
   def arranged? = song.arrangement.present?
 
   def save
-    before = song.lead_sheet&.then { |sheet| structure(sheet) }
+    before = song.lead_sheet&.structure
     sheet = build_sheet
     riffs = RiffTrack.from_h({
       "tuning" => tuning, "tone" => tone,
@@ -62,7 +62,7 @@ class SongEditor
       lyrics: lyrics.presence
     )
     song.rebuild_code!
-    @swappable = structure(sheet) == before
+    @swappable = sheet.structure == before
     true
   rescue SongSheet::Invalid, Arrangement::Invalid, Tab::Invalid => e
     @error = e.message
@@ -89,9 +89,5 @@ class SongEditor
     old_parts = song.arrangement["sections"].to_h
     parts = kept_rows.to_h { |row| [row.name, old_parts.fetch(row.original, {}).merge(row.arrangement_fields)] }
     Arrangement.from_h(song.arrangement.merge("sections" => parts), sheet)
-  end
-
-  def structure(sheet)
-    [sheet.bpm, sheet.beats, sheet.played_sections.map { |section| section.bars.size }]
   end
 end

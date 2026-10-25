@@ -10,13 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_24_123030) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_25_124538) do
   create_table "settings", force: :cascade do |t|
     t.string "key", null: false
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_settings_on_key", unique: true
+  end
+
+  create_table "song_changes", force: :cascade do |t|
+    t.integer "song_id", null: false
+    t.string "summary", null: false
+    t.json "before", null: false
+    t.datetime "undone_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["song_id"], name: "index_song_changes_on_song_id"
   end
 
   create_table "song_messages", force: :cascade do |t|
@@ -50,5 +60,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_24_123030) do
     t.index ["folder"], name: "index_songs_on_folder", unique: true
   end
 
+  add_foreign_key "song_changes", "songs"
   add_foreign_key "song_messages", "songs"
 end

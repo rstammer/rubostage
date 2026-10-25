@@ -4,9 +4,12 @@
 <%= turbo_stream_from song, :chat %>
 <section id="chat" data-controller="chat" class="flex h-full min-h-0 flex-col">
   <h2 class="text-3xl">Mit Claude reden</h2>
-  <p class="mt-1 text-muted">Über <%= song.display_title %>: Akkorde, Ablauf, Groove. Den Songtext bekommt Claude nicht.</p>
+  <p class="mt-1 text-muted">Über <%= song.display_title %>: Akkorde, Ablauf, Groove. Claude ändert auf Zuruf, alles lässt sich rückgängig machen. Den Songtext bekommt Claude nicht.</p>
   <div id="chat_messages" data-chat-target="messages" class="mt-5 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
-    <%= render partial: "song_messages/message", collection: song.messages.order(:id), as: :message %>
+    <%# Questions, answers and the changes Claude made, as they happened. %>
+    <% (song.messages.to_a + song.changes_made.to_a).sort_by(&:created_at).each do |entry| %>
+      <%= entry.is_a?(SongChange) ? render("song_changes/change", change: entry) : render("song_messages/message", message: entry) %>
+    <% end %>
   </div>
   <div id="chat_thinking"><%= render "song_messages/thinking" if song.awaiting_answer? %></div>
   <%# Kept across page refreshes, so a question being typed survives the

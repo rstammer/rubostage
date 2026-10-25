@@ -5,10 +5,11 @@ RSpec.describe SongChat do
 
   let(:client) do
     Class.new do
-      attr_reader :prompt
+      attr_reader :prompt, :toolbox
 
-      def call(prompt)
+      def call(prompt, toolbox: nil)
         @prompt = prompt
+        @toolbox = toolbox
         "Probier im Chorus mal halftime."
       end
     end.new
@@ -48,9 +49,10 @@ RSpec.describe SongChat do
     expect(prompt.index("Mehr Energie")).to be < prompt.index("Und im Chorus?")
   end
 
-  it "says how a change gets into the song, since Claude cannot make it" do
+  it "lets Claude change the song with the song tools, undoable" do
     described_class.new(song, client: client).call
-    expect(client.prompt).to match(/editor/i)
-    expect(client.prompt).to include("Neu arrangieren")
+    expect(client.toolbox.song).to eq(song)
+    expect(client.toolbox.tools).to eq(SongTools.all)
+    expect(client.prompt).to match(/undo/i)
   end
 end

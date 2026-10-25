@@ -53,6 +53,12 @@ class SongSheet
     form.map { |name| section(name) }
   end
 
+  # What a playing song's conductor is built on: tempo, bar and the length
+  # of every part in the form. Only a change that keeps it can be swapped in.
+  def structure
+    [bpm, beats, played_sections.map { |section| section.bars.size }]
+  end
+
   def to_h
     {
       "title" => title, "artist" => artist, "key" => key, "bpm" => bpm, "beats" => beats,
