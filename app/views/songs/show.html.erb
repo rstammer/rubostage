@@ -20,8 +20,6 @@
 
 <% else %>
   <% sheet = @song.lead_sheet %>
-  <div class="grid items-start gap-10 lg:grid-cols-[minmax(15rem,20rem)_minmax(0,1fr)]">
-  <%= render "songs/lyrics", song: @song %>
   <div data-controller="hotkeys" class="min-w-0">
   <div class="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
     <div class="min-w-0">
@@ -189,7 +187,6 @@
       <%= button_to "Code neu bauen", song_code_path(@song), class: "ring-button",
             title: "Baut den Sonic-Pi-Code mit dem aktuellen Groove neu" %>
     </div>
-  </div>
   </div>
   </div>
 <% end %>

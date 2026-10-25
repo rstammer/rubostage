@@ -22,6 +22,12 @@ export default class extends Controller {
     event.target.form.requestSubmit()
   }
 
+  // The form stays put across refreshes, so it is emptied here rather than
+  // replaced by the response.
+  sent(event) {
+    if (event.detail.success) event.target.reset()
+  }
+
   scroll() {
     this.messagesTarget.scrollTop = this.messagesTarget.scrollHeight
   }

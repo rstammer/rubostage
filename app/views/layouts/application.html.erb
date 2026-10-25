@@ -18,7 +18,7 @@
   <body class="min-h-screen" data-controller="theme">
     <header class="sticky top-0 z-40">
     <nav class="control-bar" aria-label="Kontrollleiste">
-      <div class="mx-auto flex max-w-6xl items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-8">
+      <div class="flex items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
         <%= link_to root_path, class: "flex shrink-0 items-center gap-3" do %>
           <%= image_tag "logo.svg", alt: "", class: "h-11 w-auto drop-shadow" %>
           <span class="nameplate">rubostage</span>
@@ -38,14 +38,22 @@
     <%= render "controls/transport", panel: ControlPanel.new %>
     </header>
 
-    <main class="mx-auto max-w-6xl px-4 py-10 sm:px-8 sm:py-16">
-      <% if flash[:notice] %>
-        <p class="sheet mb-8 px-5 py-4 text-lg"><%= flash[:notice] %></p>
-      <% end %>
-      <% if flash[:alert] %>
-        <p class="sheet mb-8 flex items-center gap-3 px-5 py-4 text-lg"><span class="lamp lamp-on" aria-hidden="true"></span><%= flash[:alert] %></p>
-      <% end %>
-      <%= yield %>
-    </main>
+    <%# Below the bars, always three areas: songs and text on the left, the
+        page in the middle, the chat on the right. Both sides draw in. %>
+    <div class="workspace" data-controller="sidebars">
+      <%= render "layouts/sidebar_left" %>
+      <main class="workspace-main">
+        <div class="mx-auto max-w-5xl">
+          <% if flash[:notice] %>
+            <p class="sheet mb-8 px-5 py-4 text-lg"><%= flash[:notice] %></p>
+          <% end %>
+          <% if flash[:alert] %>
+            <p class="sheet mb-8 flex items-center gap-3 px-5 py-4 text-lg"><span class="lamp lamp-on" aria-hidden="true"></span><%= flash[:alert] %></p>
+          <% end %>
+          <%= yield %>
+        </div>
+      </main>
+      <%= render "layouts/sidebar_right" %>
+    </div>
   </body>
 </html>

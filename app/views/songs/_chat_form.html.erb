@@ -1,9 +1,9 @@
-<%= form_with url: song_messages_path(song), scope: :message, id: "chat_form", class: "mt-5" do %>
+<%= form_with url: song_messages_path(song), scope: :message, class: "mt-5", data: {action: "turbo:submit-end->chat#sent"} do %>
   <%= label_tag "message_body", "Frage", class: "sr-only" %>
   <%= text_area_tag "message[body]", nil, id: "message_body", rows: 3, class: "field w-full px-3 py-2 text-lg",
         placeholder: "Wie kriege ich mehr Druck in den Chorus?", data: {action: "keydown->chat#send"} %>
   <div class="mt-3 flex items-center justify-between gap-3">
-    <p class="text-muted">Enter schickt ab, Shift+Enter macht eine neue Zeile.</p>
+    <p class="text-sm text-muted">Enter schickt ab, Shift+Enter neue Zeile.</p>
     <%= submit_tag "Fragen", class: "ring-button" %>
   </div>
 <% end %>

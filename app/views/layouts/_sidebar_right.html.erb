@@ -1,0 +1,17 @@
+<%# Right: the conversation with Claude about the song in front. %>
+<aside id="sidebar_right" class="sidebar sidebar-right" data-state="<%= sidebar_state(:right) %>"
+       data-sidebars-target="right" aria-label="Mit Claude reden">
+  <button type="button" class="sidebar-rail" data-action="sidebars#toggle" data-side="right"
+          aria-controls="sidebar_right_body" aria-expanded="<%= sidebar_state(:right) == "open" %>" title="Chat ein- oder ausfahren">
+    <span class="sidebar-grip" aria-hidden="true">›</span>
+    <span class="sidebar-rail-label silk">Claude</span>
+  </button>
+  <div id="sidebar_right_body" class="sidebar-body">
+    <% if sidebar_song %>
+      <%= render "songs/chat", song: sidebar_song %>
+    <% else %>
+      <h2 class="text-3xl">Mit Claude reden</h2>
+      <p class="mt-2 text-muted">Wähl einen Song, dann reden wir über ihn.</p>
+    <% end %>
+  </div>
+</aside>

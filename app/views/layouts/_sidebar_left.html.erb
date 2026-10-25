@@ -1,0 +1,48 @@
+<%# Left: the repertoire and the text of the song in front, as two tabs. %>
+<aside id="sidebar_left" class="sidebar sidebar-left" data-state="<%= sidebar_state(:left) %>"
+       data-sidebars-target="left" data-controller="sidebar-tab" data-sidebar-tab-value="<%= sidebar_tab %>" aria-label="Songs und Text">
+  <button type="button" class="sidebar-rail" data-action="sidebars#toggle" data-side="left"
+          aria-controls="sidebar_left_body" aria-expanded="<%= sidebar_state(:left) == "open" %>" title="Songs und Text ein- oder ausfahren">
+    <span class="sidebar-grip" aria-hidden="true">‹</span>
+    <span class="sidebar-rail-label silk">Songs · Text</span>
+  </button>
+  <div id="sidebar_left_body" class="sidebar-body">
+    <div class="sidebar-tabs" role="tablist">
+      <button type="button" role="tab" class="sidebar-tab" data-sidebar-tab-target="tab" data-tab="songs" data-action="sidebar-tab#show" aria-selected="<%= sidebar_tab == "songs" %>">Songs</button>
+      <button type="button" role="tab" class="sidebar-tab" data-sidebar-tab-target="tab" data-tab="text" data-action="sidebar-tab#show" aria-selected="<%= sidebar_tab == "text" %>">Text</button>
+    </div>
+
+    <div id="sidebar_songs" class="sidebar-panel" role="tabpanel" data-sidebar-tab-target="panel" data-tab="songs" <%= "hidden" unless sidebar_tab == "songs" %>>
+      <ul class="space-y-1">
+        <% Song.newest_first.each do |song| %>
+          <li>
+            <%= link_to song, aria: ({current: "page"} if song == sidebar_song && @song == song),
+                  class: "sidebar-song #{"is-current" if song == sidebar_song}" do %>
+              <span class="block truncate font-display text-xl"><%= song.display_title %></span>
+              <span class="block truncate text-sm text-muted">
+                <%= [song.artist.presence || ("eigener Song" if song.manual?),
+                     (song.key.presence if song.ready?), ("#{song.bpm} bpm" if song.ready?)].compact.join(" · ") %>
+              </span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <%= link_to "+ Neuer Song", new_song_path, class: "ring-button button-go mt-4 w-full" %>
+    </div>
+
+    <div id="lyrics" class="sidebar-panel" role="tabpanel" data-sidebar-tab-target="panel" data-tab="text" <%= "hidden" unless sidebar_tab == "text" %>>
+      <% if sidebar_song %>
+        <h2 class="text-2xl"><%= sidebar_song.display_title %></h2>
+        <% if sidebar_song.lyrics.present? %>
+          <div class="mt-3 text-lg leading-relaxed whitespace-pre-line"><%= sidebar_song.lyrics %></div>
+        <% else %>
+          <p class="mt-2 text-muted">
+            Noch kein Songtext. Im <%= link_to "Editor", edit_song_path(sidebar_song), class: "underline" %> hineinkopieren.
+          </p>
+        <% end %>
+      <% else %>
+        <p class="text-muted">Wähl einen Song, dann steht hier sein Text.</p>
+      <% end %>
+    </div>
+  </div>
+</aside>
