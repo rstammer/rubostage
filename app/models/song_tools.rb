@@ -6,7 +6,10 @@
 module SongTools
   class Error < StandardError; end
 
-  ALL = -> { [SongTools::GetSong, SongTools::EditSheet, SongTools::EditBand] }
+  ALL = -> {
+    [SongTools::GetSong, SongTools::EditSheet, SongTools::EditBand, SongTools::EditRiffs,
+      SongTools::Rearrange, SongTools::Play, SongTools::Stop]
+  }
 
   def self.all = ALL.call
 

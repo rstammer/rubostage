@@ -64,4 +64,24 @@ RSpec.describe ArrangeSongJob do
     described_class.perform_now(song)
     expect(song.reload.code).to eq(song.groove.code)
   end
+
+  describe "asked for from the chat" do
+    it "makes the new arrangement a change that can be taken back" do
+      described_class.perform_now(song, wish: "mehr Funk", summary: "Funkiger")
+      change = song.changes_made.last
+      expect(change.summary).to eq("Funkiger")
+      expect(change.before["arrangement"]).to be_nil
+      change.undo!
+      expect(song.reload.arrangement).to be_nil
+      expect(song.arrangement_status).to eq("none")
+    end
+
+    it "says in the chat when it fails" do
+      allow(writer).to receive(:call).and_raise(ClaudeCli::Failed, "timeout")
+      described_class.perform_now(song, summary: "Funkiger")
+      expect(song.messages.last).to have_attributes(role: "assistant")
+      expect(song.messages.last.body).to include("nicht geklappt")
+      expect(song.changes_made).to be_empty
+    end
+  end
 end

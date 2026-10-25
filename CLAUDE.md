@@ -80,9 +80,13 @@ gestartete. Das Chat-Formular ist `data-turbo-permanent` mit Song-Id in der
 
 **Claude ändert Songs direkt** (Chat rechts). Schichten, damit der Wechsel auf
 RubyLLM nur einen Adapter kostet:
-- `SongTools::GetSong/EditSheet/EditBand` — reines Ruby (Name, Beschreibung,
-  JSON-Schema, `call(song, args)`), kennt weder MCP noch RubyLLM. `EditSheet`
-  geht durch `SongEditor`, also dieselben Prüfungen wie im Editor.
+- `SongTools::*` (`get_song`, `edit_sheet`, `edit_band`, `edit_riffs`,
+  `rearrange`, `play`, `stop`) — reines Ruby (Name, Beschreibung, JSON-Schema,
+  `call(song, args)`), kennt weder MCP noch RubyLLM. `edit_sheet`/`edit_riffs`
+  gehen über `ThroughEditor` durch `SongEditor`, also dieselben Prüfungen wie
+  im Editor. `rearrange` startet `ArrangeSongJob(summary:)`: Ergebnis kommt
+  als Änderung mit Rückgängig, Fehlschlag als Chat-Nachricht. `play`/`stop`
+  ändern nichts am Song und sind nicht rückgängig zu machen.
 - `SongChange.record(song, summary) { … }` — Schnappschuss vorher, Code neu
   bauen, `LiveSwap` (gemeinsam mit dem Editor). `undo!` nimmt die Änderung
   und alle danach zurück. Assoziation heißt `changes_made` (`changes` ist AR).

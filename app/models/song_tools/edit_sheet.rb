@@ -1,13 +1,15 @@
-# Changes the sheet the way the editor does, so the same checks apply:
-# title, key, tempo, bar, form, and per section its chords and tabs. Only
-# what is given changes; a section's band part stays with it.
+# Changes the sheet the way the editor does: title, key, tempo, bar, form,
+# and per section its chords. Only what is given changes; a section's band
+# part and riffs stay with it.
 class SongTools::EditSheet < SongTools::Tool
+  include SongTools::ThroughEditor
+
   define(
     name: "edit_sheet",
     description: "Change the song's sheet. Give only what changes. Chords are written like the " \
       "chart: bars split by \"|\", chords within a bar by spaces, \"%\" holds the chord before. " \
       "A section given by a name that does not exist yet is added; add it to the form too. " \
-      "The busker can undo every change.",
+      "Riffs are changed with edit_riffs. The busker can undo every change.",
     input_schema: {
       type: "object",
       properties: {
@@ -20,11 +22,7 @@ class SongTools::EditSheet < SongTools::Tool
           type: "array",
           items: {
             type: "object",
-            properties: {
-              name: {type: "string"}, rename_to: {type: "string"}, chords: {type: "string"},
-              tab: {type: "string", description: "Guitar tab, six lines, sixteen characters per bar; empty removes it."},
-              bass_tab: {type: "string", description: "Bass tab, four lines; empty removes it. Silences the bass line in its section."}
-            },
+            properties: {name: {type: "string"}, rename_to: {type: "string"}, chords: {type: "string"}},
             required: ["name"]
           }
         },
@@ -37,40 +35,18 @@ class SongTools::EditSheet < SongTools::Tool
   SHEET_FIELDS = %w[title artist key bpm beats].freeze
 
   def call(song, args)
-    current = SongEditor.for(song)
-    params = SHEET_FIELDS.to_h { |field| [field, args.fetch(field, current.public_send(field))] }
-    params["form"] = args["form"] ? Array(args["form"]).join(", ") : current.form
-    params.merge!("tuning" => current.tuning, "tone" => current.tone, "lyrics" => current.lyrics)
-    params["sections"] = sections(current.rows.reject(&:blank?), args).each_with_index.to_h { |row, i| [i.to_s, row] }
+    change = save_through_editor(song, args["summary"].presence || "Gerüst geändert") do |params, rows|
+      params.merge!(args.slice(*SHEET_FIELDS))
+      params["form"] = Array(args["form"]).join(", ") if args["form"]
+      rows.reject! { |row| Array(args["remove_sections"]).include?(row["name"]) }
+      Array(args["sections"]).each do |section|
+        row = rows.find { |candidate| candidate["name"] == section["name"] }
+        next rows << {"original" => "", "name" => section["name"], "chords" => section["chords"].to_s} unless row
 
-    change = SongChange.record(song, args["summary"].presence || "Gerüst geändert") do
-      editor = SongEditor.new(song, params)
-      raise SongTools::Error, editor.error unless editor.save
+        row["chords"] = section["chords"] if section.key?("chords")
+        row["name"] = section["rename_to"] if section["rename_to"].present?
+      end
     end
     changed(change)
-  end
-
-  private
-
-  def sections(rows, args)
-    removed = Array(args["remove_sections"])
-    given = Array(args["sections"]).index_by { |section| section["name"] }
-    kept = rows.reject { |row| removed.include?(row.name) }.map do |row|
-      change = given.delete(row.name) || {}
-      row_params(row).merge(
-        "name" => change["rename_to"].presence || row.name,
-        "chords" => change.fetch("chords", row.chords),
-        "tab" => change.fetch("tab", row.tab), "bass_tab" => change.fetch("bass_tab", row.bass_tab)
-      )
-    end
-    kept + given.values.map do |section|
-      {"original" => "", "name" => section["name"], "chords" => section["chords"].to_s,
-       "tab" => section["tab"].to_s, "bass_tab" => section["bass_tab"].to_s}
-    end
-  end
-
-  def row_params(row)
-    {"original" => row.original, "energy" => row.energy, "groove" => row.groove, "guitar" => row.guitar,
-     "swing" => row.swing, "fill" => row.fill ? "1" : "0"}
   end
 end

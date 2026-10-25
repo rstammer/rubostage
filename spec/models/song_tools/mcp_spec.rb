@@ -14,7 +14,7 @@ RSpec.describe SongTools::Mcp do
 
   it "lists the song tools with their schemas" do
     tools = rpc("tools/list")[:result][:tools]
-    expect(tools.map { |tool| tool[:name] }).to eq(%w[get_song edit_sheet edit_band])
+    expect(tools.map { |tool| tool[:name] }).to eq(%w[get_song edit_sheet edit_band edit_riffs rearrange play stop])
     expect(tools.first).to include(:description, :inputSchema)
   end
 

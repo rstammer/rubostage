@@ -10,7 +10,7 @@ RSpec.describe "The song tools over MCP", type: :request do
   it "serves the tools to a client with the token" do
     call_mcp("Authorization" => "Bearer #{token}")
     expect(response).to have_http_status(:ok)
-    expect(response.parsed_body.dig("result", "tools").size).to eq(3)
+    expect(response.parsed_body.dig("result", "tools").size).to eq(SongTools.all.size)
   end
 
   it "turns away a client without it" do

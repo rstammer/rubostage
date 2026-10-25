@@ -54,5 +54,6 @@ RSpec.describe SongChat do
     expect(client.toolbox.song).to eq(song)
     expect(client.toolbox.tools).to eq(SongTools.all)
     expect(client.prompt).to match(/undo/i)
+    expect(client.prompt).to include("edit_riffs", "rearrange", "play")
   end
 end
