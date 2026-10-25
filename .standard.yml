@@ -1,3 +1,8 @@
 ignore:
   - "db/*schema.rb"
   - "bin/**/*"
+  # Exported by the app, overwritten on the next export. starlight is
+  # written by hand and stays in.
+  - "examples/crawling/**/*"
+  - "examples/something_in_the_way/**/*"
+  - "examples/traveller/**/*"
