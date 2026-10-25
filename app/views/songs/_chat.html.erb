@@ -8,7 +8,7 @@
   <div id="chat_messages" data-chat-target="messages" class="mt-5 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
     <%= render partial: "song_messages/message", collection: song.messages.order(:id), as: :message %>
   </div>
-  <div id="chat_thinking"></div>
+  <div id="chat_thinking"><%= render "song_messages/thinking" if song.awaiting_answer? %></div>
   <%# Kept across page refreshes, so a question being typed survives the
       song changing underneath; one per song, so it never posts to another. %>
   <div id="chat_form_<%= song.id %>" data-turbo-permanent>

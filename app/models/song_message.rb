@@ -9,7 +9,8 @@ class SongMessage < ApplicationRecord
   validates :body, presence: true
 
   after_create_commit -> { broadcast_append_to song, :chat, target: "chat_messages", partial: "song_messages/message", locals: {message: self} }
-  after_create_commit -> { broadcast_update_to song, :chat, target: "chat_thinking", html: "" }, unless: :user?
+  # The lamp goes out with the answer to the last question still open.
+  after_create_commit -> { broadcast_update_to song, :chat, target: "chat_thinking", html: "" }, unless: -> { user? || song.awaiting_answer? }
 
   def user? = role == "user"
 end

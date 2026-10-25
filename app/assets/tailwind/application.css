@@ -496,6 +496,44 @@
     }
   }
 
+  /* Claude's answers, set from markdown. */
+  .chat-text {
+    & > * + * {
+      margin-top: 0.6em;
+    }
+    & ul {
+      list-style: disc;
+      padding-left: 1.2em;
+    }
+    & ol {
+      list-style: decimal;
+      padding-left: 1.4em;
+    }
+    & h1, & h2, & h3 {
+      font-size: 1.3rem;
+    }
+    & code {
+      font-size: 0.9em;
+      padding: 0 0.2em;
+      border-radius: 0.2rem;
+      background: color-mix(in srgb, var(--ink) 9%, transparent);
+    }
+    & pre {
+      overflow-x: auto;
+      padding: 0.5rem;
+      border-radius: 0.3rem;
+      background: color-mix(in srgb, var(--ink) 9%, transparent);
+    }
+    & pre code {
+      padding: 0;
+      background: none;
+    }
+    & blockquote {
+      padding-left: 0.8em;
+      border-left: 3px solid var(--accent);
+    }
+  }
+
   .sheet {
     background: var(--card);
     border-radius: 0.5rem;

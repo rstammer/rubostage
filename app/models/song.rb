@@ -21,6 +21,13 @@ class Song < ApplicationRecord
     define_method(:"#{name}?") { origin == name }
   end
 
+  # Every question gets one answer, so more questions than answers means
+  # Claude is still at it.
+  def awaiting_answer?
+    counts = messages.group(:role).count
+    counts.fetch("user", 0) > counts.fetch("assistant", 0)
+  end
+
   def lead_sheet
     SongSheet.from_h(sheet) if ready? && sheet.present?
   end

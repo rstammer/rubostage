@@ -1,4 +1,10 @@
-<div id="<%= dom_id(message) %>" class="<%= message.user? ? "ml-8" : "mr-8" %>">
+<div id="<%= dom_id(message) %>" class="<%= message.user? ? "ml-8" : "mr-4" %>">
   <p class="eyebrow <%= "text-right" if message.user? %>"><%= message.user? ? "Du" : "Claude" %></p>
-  <div class="mt-1 rounded px-3 py-2 text-lg leading-relaxed <%= message.user? ? "field" : "" %>"><%= simple_format(message.body, {}, wrapper_tag: "div") %></div>
+  <div class="mt-1 rounded px-3 py-2 text-lg leading-relaxed <%= "field" if message.user? %>">
+    <% if message.user? %>
+      <%= simple_format(message.body, {}, wrapper_tag: "div") %>
+    <% else %>
+      <%= chat_markdown(message.body) %>
+    <% end %>
+  </div>
 </div>
