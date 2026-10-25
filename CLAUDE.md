@@ -68,6 +68,16 @@ bleibt nach Stopp stehen, auf jeder Seite. Knöpfe antworten im Frame; Spielen/
 Stopp leiten bei `Turbo-Frame: transport` auf `transport_path` um, denn Frame-
 Requests bekommen kein Layout und die Leiste wäre sonst leer.
 
+Unter den Leisten **immer drei Bereiche** (`layouts/application`): links
+`_sidebar_left` (Reiter Songs = Repertoire, Text = Songtext), Mitte die Seite,
+rechts `_sidebar_right` mit dem **Claude-Chat** (`SongChat`, `SongChatJob`,
+`song_messages`). Beide Seiten fahren ein (Schiene mit Griff, `sidebars`-
+Controller); Zustand und Reiter liegen in Cookies (`sidebar_left`,
+`sidebar_right`, `sidebar_tab`), damit der Server gleich richtig zeichnet.
+Worum es geht, sagt `sidebar_song`: der Song der Seite, sonst der zuletzt
+gestartete. Das Chat-Formular ist `data-turbo-permanent` mit Song-Id in der
+`id` und wird per JS geleert, nicht per Stream ersetzt.
+
 `examples/starlight/` ist die handgeschriebene Vorlage, nach der `Groove`
 gebaut wurde (4-Takt-Sektionen, `get[:section]`, `:clock` zuletzt definieren).
 Kam am 2026-10-20 aus mcblinded herüber, weil es ein Muse-Cover ist.
