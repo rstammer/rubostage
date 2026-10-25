@@ -94,6 +94,12 @@ RubyLLM nur einen Adapter kostet:
   `SongTools::ClaudeCliClient` (`claude -p --mcp-config … --strict-mcp-config
   --allowedTools mcp__rubostage__*`, Subscription). **Wechselstelle:** ein
   `RubyLlmClient`, der je Tool ein `RubyLLM::Tool` baut und `toolbox.run` ruft.
+- **Streaming:** `client.call(prompt, toolbox:, on_tool:) { |text| … }` — Block
+  für Textstücke, `on_tool` für Werkzeug-Namen (wie RubyLLMs Block und
+  `on_tool_call`). `ClaudeCli` nutzt dafür `stream-json --include-partial-
+  messages`; `ChatDraft` zeigt den wachsenden Entwurf (`draft_<job_id>`) und
+  die `activity` des Werkzeugs. Die meiste Wartezeit ist Start + Werkzeuge,
+  nicht Schreiben.
 - MCP-Endpunkt `POST /songs/:id/mcp` (`McpController`, `SongTools::Mcp`,
   handgeschriebenes JSON-RPC) **muss in Puma laufen**: `NowPlaying` und der
   `async`-Cable-Adapter leben nur im Server-Prozess. Token in `tmp/mcp_token`
