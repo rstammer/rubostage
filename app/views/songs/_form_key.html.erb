@@ -1,0 +1,7 @@
+<%# One part of the form as a key: dragged to its place, removed with ×. %>
+<li class="form-chip" draggable="true" data-form-order-target="item" data-name="<%= name %>"
+    data-action="dragstart->form-order#pick dragend->form-order#drop">
+  <span class="form-chip-grip" aria-hidden="true">⋮⋮</span>
+  <span data-form-order-target="label"><%= name %></span>
+  <button type="button" class="form-chip-remove" data-action="form-order#remove" aria-label="<%= name %> entfernen" title="Entfernen">×</button>
+</li>

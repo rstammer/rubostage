@@ -8,7 +8,7 @@
   </p>
 <% end %>
 
-<%= form_with data: {controller: "reveal"}, url: (@song.new_record? ? songs_path : song_path(@song)), method: (@song.new_record? ? :post : :patch), scope: :song, class: "mt-10 space-y-6" do %>
+<%= form_with data: {controller: "reveal form-order"}, url: (@song.new_record? ? songs_path : song_path(@song)), method: (@song.new_record? ? :post : :patch), scope: :song, class: "mt-10 space-y-6" do %>
   <%= hidden_field_tag "song[origin]", "manual", id: nil if @song.new_record? %>
   <section class="<%= card %> grid gap-5 sm:grid-cols-2">
     <div>
@@ -34,11 +34,29 @@
               title: "2/4: Die Akkorde wechseln alle zwei Schläge, die Band spielt ruhig im Vierertakt weiter." %>
       </div>
     </div>
-    <div>
-      <%= label_tag "song_form", "Ablauf", class: label %>
-      <%= text_field_tag "song[form]", @editor.form, id: "song_form", class: field, placeholder: "Intro, Verse, Chorus, Verse" %>
-      <p class="mt-1 text-muted">Teile in Spielreihenfolge, mit Komma getrennt.</p>
+  </section>
+
+  <%# The form as a row of keys: drag them into order, × takes one out, the
+      sections below add one at the end. The server still gets the names in
+      a comma list, through the hidden field. %>
+  <section class="<%= card %>">
+    <p class="<%= label %>">Ablauf</p>
+    <%= hidden_field_tag "song[form]", @editor.form, id: "song_form", data: {form_order_target: "input"} %>
+    <ol class="mt-3 flex min-h-12 flex-wrap gap-2" data-form-order-target="list"
+        data-action="dragover->form-order#over drop->form-order#dropped">
+      <% @editor.form.split(",").map(&:strip).reject(&:empty?).each do |part| %>
+        <%= render "songs/form_key", name: part %>
+      <% end %>
+    </ol>
+    <p class="mt-2 text-muted" data-form-order-target="empty" <%= "hidden" if @editor.form.present? %>>Noch leer – unten einen Teil anklicken.</p>
+    <template data-form-order-target="template"><%= render "songs/form_key", name: "" %></template>
+    <div class="mt-4 flex flex-wrap items-center gap-2" data-form-order-target="palette">
+      <span class="eyebrow mr-1">Hinzufügen:</span>
+      <% @editor.rows.reject(&:blank?).map(&:name).uniq.each do |part| %>
+        <button type="button" class="ring-button !px-3 !py-1 !text-base" data-action="form-order#add" data-name="<%= part %>">+ <%= part %></button>
+      <% end %>
     </div>
+    <p class="mt-2 text-muted">Ziehen zum Umsortieren, × entfernt. Neue Abschnitte unten anlegen, dann tauchen sie hier auf.</p>
   </section>
 
   <section class="<%= card %> grid gap-5 sm:grid-cols-2">
@@ -77,7 +95,8 @@
         <div>
           <%= label_tag id.call(:name), row.original.present? ? "Abschnitt" : "Neuer Abschnitt", class: label %>
           <%= text_field_tag name.call(:name), row.name, id: id.call(:name), class: "#{field} font-semibold",
-                placeholder: ("z. B. Bridge" if row.original.blank?) %>
+                placeholder: ("z. B. Bridge" if row.original.blank?),
+                data: {form_order_target: "section", action: "focus->form-order#remember change->form-order#renamed input->form-order#sections"} %>
           <% if row.original.present? %>
             <p class="mt-1 text-muted">Name und Akkorde leeren entfernt den Abschnitt.</p>
           <% end %>

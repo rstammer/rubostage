@@ -130,6 +130,16 @@ RSpec.describe "Songs", type: :request do
       expect(response.body).to include('name="song[bpm]"', "B | C#m | G#m | E", 'name="song[sections][0][tab]"', 'name="song[sections][1][name]"')
     end
 
+    it "lays out the form as keys to drag and remove, with the song's sections to add" do
+      song.update!(sheet: song.sheet.merge("sections" => song.sheet["sections"] + [{"name" => "Chorus", "bars" => [["E"]]}],
+        "form" => %w[Verse Chorus Verse]))
+      get edit_song_path(song)
+      expect(response.body).to include('type="hidden" name="song[form]" id="song_form" value="Verse, Chorus, Verse"')
+      expect(response.body.scan(/data-form-order-target="item" data-name="(\w+)"/).flatten).to eq(%w[Verse Chorus Verse])
+      expect(response.body).to include('draggable="true"', 'data-action="form-order#remove"', "Verse entfernen")
+      expect(response.body).to match(/data-action="form-order#add"[^>]*>\+ Chorus/)
+    end
+
     it "has a box to paste the lyrics into" do
       get edit_song_path(song)
       expect(response.body).to include('name="song[lyrics]"', "Songtext")
