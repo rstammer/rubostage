@@ -44,8 +44,10 @@ class SongChat
     @client = client
   end
 
-  def call
-    @client.call(prompt, toolbox: SongTools::Toolbox.new(@song))
+  # With a block, the answer comes in pieces as it is written; on_tool hears
+  # the name of each tool Claude uses.
+  def call(on_tool: nil, &on_text)
+    @client.call(prompt, toolbox: SongTools::Toolbox.new(@song), on_tool: on_tool, &on_text)
   end
 
   private

@@ -18,5 +18,6 @@ RSpec.describe SongTools::GetSong do
   it "describes itself for any client" do
     expect(described_class.tool_name).to eq("get_song")
     expect(described_class.input_schema).to include(type: "object")
+    expect(SongTools.all.map(&:activity)).to all(be_present)
   end
 end

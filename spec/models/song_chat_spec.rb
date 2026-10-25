@@ -7,7 +7,7 @@ RSpec.describe SongChat do
     Class.new do
       attr_reader :prompt, :toolbox
 
-      def call(prompt, toolbox: nil)
+      def call(prompt, toolbox: nil, on_tool: nil)
         @prompt = prompt
         @toolbox = toolbox
         "Probier im Chorus mal halftime."

@@ -2,6 +2,7 @@
 class SongTools::GetSong < SongTools::Tool
   define(
     name: "get_song",
+    activity: "liest den Song",
     description: "Read the song as it is right now: key, tempo, bar, form, chords per section, " \
       "the band's sounds and parts per section, and the riffs as tabs.",
     input_schema: {type: "object", properties: {}}

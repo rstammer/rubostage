@@ -2,6 +2,7 @@
 class SongTools::Play < SongTools::Tool
   define(
     name: "play",
+    activity: "startet den Song",
     description: "Start the song in Sonic Pi from the top, so the busker hears it.",
     input_schema: {type: "object", properties: {}}
   )

@@ -4,6 +4,7 @@
 class SongTools::Rearrange < SongTools::Tool
   define(
     name: "rearrange",
+    activity: "lässt neu arrangieren",
     description: "Have the whole band arrangement written anew from scratch, following a wish. Takes a " \
       "minute or two and replaces every section's part; for a targeted change use edit_band instead. " \
       "The result appears in the chat with an undo button.",

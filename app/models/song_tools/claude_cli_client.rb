@@ -5,7 +5,7 @@ class SongTools::ClaudeCliClient
     @cli = cli
   end
 
-  def call(prompt, toolbox:)
-    @cli.call(prompt, mcp: toolbox.mcp)
+  def call(prompt, toolbox:, on_tool: nil, &on_text)
+    @cli.call(prompt, mcp: toolbox.mcp, on_tool: on_tool, &on_text)
   end
 end

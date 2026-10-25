@@ -2,6 +2,7 @@
 class SongTools::Stop < SongTools::Tool
   define(
     name: "stop",
+    activity: "stoppt die Musik",
     description: "Stop the music.",
     input_schema: {type: "object", properties: {}}
   )

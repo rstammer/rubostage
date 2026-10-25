@@ -6,6 +6,7 @@ class SongTools::EditSheet < SongTools::Tool
 
   define(
     name: "edit_sheet",
+    activity: "ändert das Gerüst",
     description: "Change the song's sheet. Give only what changes. Chords are written like the " \
       "chart: bars split by \"|\", chords within a bar by spaces, \"%\" holds the chord before. " \
       "A section given by a name that does not exist yet is added; add it to the form too. " \

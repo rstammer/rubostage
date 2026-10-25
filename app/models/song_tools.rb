@@ -14,4 +14,6 @@ module SongTools
   def self.all = ALL.call
 
   def self.find(name) = all.find { |tool| tool.tool_name == name }
+
+  def self.activity(name) = find(name)&.activity || "arbeitet am Song"
 end

@@ -1,0 +1,7 @@
+<div id="<%= id %>" class="mr-4">
+  <p class="eyebrow">Claude <span class="lamp lamp-blink ml-1 !size-2.5 align-middle" aria-hidden="true"></span>
+    <% if doing %><span class="ml-1 italic"><%= doing %> …</span><% end %></p>
+  <% if text.present? %>
+    <div class="mt-1 rounded px-3 py-2 text-lg leading-relaxed"><%= chat_markdown(text) %></div>
+  <% end %>
+</div>

@@ -5,6 +5,7 @@ class SongTools::EditBand < SongTools::Tool
 
   define(
     name: "edit_band",
+    activity: "ändert die Band",
     description: "Change how the band plays the song. Give only what changes. Patterns are #{PATTERN}: " \
       "drums and comp use \"x\" or \".\", bass uses \"1\" (root), \"5\" (fifth), \"8\" (octave) or \".\". " \
       "Named grooves bring their own drums; to spell out kick, snare and hats, set groove to \"custom\". " \

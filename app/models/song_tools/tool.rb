@@ -3,12 +3,15 @@
 # which goes back to the model so it can try again.
 class SongTools::Tool
   class << self
-    attr_reader :tool_name, :description, :input_schema
+    attr_reader :tool_name, :description, :input_schema, :activity
 
-    def define(name:, description:, input_schema:)
+    # activity says in German what the tool does, for the chat to show
+    # while Claude uses it.
+    def define(name:, description:, input_schema:, activity:)
       @tool_name = name
       @description = description
       @input_schema = input_schema
+      @activity = activity
     end
   end
 

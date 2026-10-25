@@ -5,6 +5,7 @@ class SongTools::EditRiffs < SongTools::Tool
 
   define(
     name: "edit_riffs",
+    activity: "ändert die Riffs",
     description: "Change the riffs. tone is how guitar riffs sound (crunch = distorted, clean); tuning is " \
       "what the tabs are fretted in. A guitar tab has six lines, high string on top, a bass tab four; " \
       "each bar is sixteen characters between two \"|\": a number is a fret, \"x\" a muted note, \"-\" lets " \
